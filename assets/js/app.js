@@ -15,6 +15,7 @@
   const LIKERT = ['#dc2626', '#fb923c', '#cbd5e1', '#60a5fa', '#2563eb'];
   const CAT_COLOR = { 'cat-1': '#dc2626', 'cat-2': '#f97316', 'cat-3': '#f59e0b', 'cat-4': '#0ea5e9', 'cat-5': '#16a34a' };
   const T = {};
+  const MASCOT = '<img class="band-mascot" src="assets/img/maskot.png" alt="Maskot burung, harimau, dan gajah melambai" width="388" height="131">';
 
   const state = { sheets: null, source: '', loadedAt: null, prepared: {}, filters: { area: '', div: '' }, charts: [], route: 'ringkasan', ui: {} };
 
@@ -182,10 +183,13 @@
 
     $('#app').innerHTML = `
       <section class="band">
-        <div class="band-text">
-          <p class="eyebrow">Survey Pengukuran Kepuasan Divisi · Karyawan MPM ${CFG.year}</p>
-          <h1>Ringkasan Index Pelayanan Divisi ${CFG.year}</h1>
-          <p class="band-meta">Periode respons ${dates.length ? fmtDate(dates[0]) + ' – ' + fmtDate(dates[dates.length - 1]) : '–'} · ${esc(state.source)}</p>
+        <div class="band-head">
+          <div class="band-text">
+            <p class="eyebrow">Survey Pengukuran Kepuasan Divisi · Karyawan MPM ${CFG.year}</p>
+            <h1>Ringkasan Index Pelayanan Divisi ${CFG.year}</h1>
+            <p class="band-meta">Periode respons ${dates.length ? fmtDate(dates[0]) + ' – ' + fmtDate(dates[dates.length - 1]) : '–'} · ${esc(state.source)}</p>
+          </div>
+          ${MASCOT}
         </div>
         <div class="band-kpis">
           ${kpi('Total respons', totalN, `${rows.length} survey divisi`, 'kpi-spark', 'kSpark')}
@@ -459,10 +463,13 @@
 
     $('#app').innerHTML = `
       <section class="band">
-        <div class="band-text">
-          <p class="eyebrow">Survey Pengukuran Kepuasan · ${esc(d.full)}</p>
-          <h1>Index Pelayanan ${esc(d.name)} ${CFG.year}</h1>
-          <p class="band-meta">${resp.length} responden${resp.length !== prep.respondents.length ? ` (dari ${prep.respondents.length}, sesuai filter)` : ''} · ${esc(state.source)}</p>
+        <div class="band-head">
+          <div class="band-text">
+            <p class="eyebrow">Survey Pengukuran Kepuasan · ${esc(d.full)}</p>
+            <h1>Index Pelayanan ${esc(d.name)} ${CFG.year}</h1>
+            <p class="band-meta">${resp.length} responden${resp.length !== prep.respondents.length ? ` (dari ${prep.respondents.length}, sesuai filter)` : ''} · ${esc(state.source)}</p>
+          </div>
+          ${MASCOT}
         </div>
         <div class="band-kpis">
           <div class="kpi kpi-gauge"><span class="kpi-label">Index ${CFG.year}</span><div class="kpi-gaugebox" id="kGauge"></div>${catBadge(an.index[0])}</div>

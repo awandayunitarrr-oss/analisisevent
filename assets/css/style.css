@@ -120,7 +120,10 @@ main { padding-top: 20px; padding-bottom: 24px; }
               radial-gradient(circle at 80% 120%, rgba(255, 255, 255, .16) 0 22%, transparent 23%),
               linear-gradient(120deg, var(--brand-2), var(--brand) 55%, #f43f5e);
   box-shadow: 0 14px 34px rgba(200, 16, 46, .25); display: grid; gap: 20px; }
-.band-text { max-width: 760px; }
+.band-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.band-text { max-width: 760px; min-width: 0; flex: 1 1 360px; }
+.band-mascot { height: clamp(84px, 11vw, 140px); width: auto; max-width: 100%; margin: -8px 0 -26px; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .25)); animation: mascot-bob 4s ease-in-out infinite; }
+@keyframes mascot-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 .band .eyebrow { margin: 0 0 6px; font-weight: 800; font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; opacity: .9; }
 .band-meta { margin: 8px 0 0; opacity: .88; font-size: .86rem; }
 .band-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
@@ -276,6 +279,7 @@ mark { background: var(--mark); color: inherit; padding: 0 2px; border-radius: 3
   .div-cards { grid-template-columns: minmax(0, 1fr); }
   .brand-sub { display: none; }
   .band { padding: 18px; border-radius: 20px; }
+  .band-mascot { margin: 0 auto -10px; }
   .kpi-value { font-size: 1.5rem; }
   .filters label { flex: 1 1 45%; }
   .filters select { min-width: 0; width: 100%; }
@@ -286,7 +290,7 @@ mark { background: var(--mark); color: inherit; padding: 0 2px; border-radius: 3
   .waffle-wrap { grid-template-columns: minmax(0, 1fr); }
   .waffle { max-width: 220px; }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } .band-mascot { animation: none; } }
 
 @media print {
   .topbar, .filters, .seg, #sortSel, .source { display: none !important; }
