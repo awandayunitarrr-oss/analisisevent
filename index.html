@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Survey Layanan Internal 2026</title>
+  <meta name="description" content="Dashboard interaktif analisis Survey Pengukuran Kepuasan Layanan Divisi 2026 – MPM">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#/ringkasan">
+        <span class="brand-mark" aria-hidden="true">★</span>
+        <span>
+          <span class="brand-title">Survey Kepuasan Layanan Divisi</span>
+          <span class="brand-sub">Karyawan MPM · 2026</span>
+        </span>
+      </a>
+      <div class="source">
+        <span id="sourceStatus" class="pill pill-muted">Memuat data…</span>
+        <button id="btnRefresh" class="btn btn-ghost" type="button" title="Muat ulang data dari Google Sheets">↻ Refresh</button>
+        <label class="btn btn-ghost" title="Unggah file export spreadsheet (.xlsx)">
+          ⤒ Unggah
+          <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" hidden>
+        </label>
+        <button class="btn btn-ghost" type="button" onclick="window.print()" title="Cetak / simpan PDF">⎙ Cetak</button>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Navigasi divisi"></nav>
+  </header>
+
+  <section class="filters" id="filters" aria-label="Filter responden">
+    <div class="filters-inner">
+      <label>Area kerja
+        <select id="fArea"><option value="">Semua area</option></select>
+      </label>
+      <label>Divisi responden
+        <select id="fDiv"><option value="">Semua divisi</option></select>
+      </label>
+      <label>Jabatan
+        <select id="fJab"><option value="">Semua jabatan</option></select>
+      </label>
+      <button id="btnReset" class="btn btn-link" type="button">Reset filter</button>
+      <span id="filterNote" class="filter-note"></span>
+    </div>
+  </section>
+
+  <main id="app" class="container">
+    <div class="loading">Memuat data survey…</div>
+  </main>
+
+  <footer class="footer container">
+    <p>Skala kepuasan 1–5 · Sangat puas = 5, Puas = 4, Antara iya dan tidak = 3, Tidak puas = 2, Sangat tidak puas = 1.
+      Jawaban “Tidak pernah” tidak dihitung. Index = rata-rata skor seluruh indikator.</p>
+    <p>Kategori: &lt; 1.8 Tidak puas · 1.8–2.6 Kurang puas · 2.6–3.4 Antara puas dan tidak · 3.4–4.2 Puas · &gt; 4.2 Sangat puas.
+      Pembanding 2023–2025 diambil dari Report Survey Pelayanan Divisi 2025.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="data/snapshot.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/analytics.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
