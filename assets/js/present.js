@@ -23,22 +23,36 @@
     return ROUTES.includes(r) ? r : 'ringkasan';
   };
 
-  // Bagian berisi banyak kartu (analisis tambahan) dipecah per dua kartu agar tetap terbaca.
+  // Susunan slide: beberapa bagian digabung dalam satu slide agar ruang terpakai maksimal dan jumlah slide sedikit.
+  const PLAN = {
+    ringkasan: [['ov-band', 'ov-cards'], ['ov-change', 'ov-area'], ['ov-river', 'ov-rank'], ['ov-insight', 'ov-table']],
+    divisi: [['dv-band', 'dv-insight'], ['dv-trend', 'dv-prio'], ['dv-items'], ['dv-extras'], ['dv-comments', 'dv-profile'], ['dv-table']],
+  };
+  const EXTRAS_PER_SLIDE = 4;
+
   function buildSlides() {
+    const plan = PLAN[currentRoute() === 'ringkasan' ? 'ringkasan' : 'divisi'];
+    const byKey = (k) => app.querySelector(`:scope > [data-s="${k}"]`);
     const list = [];
-    Array.from(app.children).forEach((el) => {
-      if (el.classList.contains('alert')) return;
-      if (el.classList.contains('extras') && el.children.length > 2) {
-        const kids = Array.from(el.children);
-        for (let i = 0; i < kids.length; i += 2) list.push({ el, kids: kids.slice(i, i + 2) });
-      } else list.push({ el, kids: null });
+    const used = new Set();
+    plan.forEach((keys) => {
+      const els = keys.map(byKey).filter(Boolean);
+      els.forEach((e) => used.add(e));
+      if (!els.length) return;
+      if (els.length === 1 && els[0].classList.contains('extras') && els[0].children.length > EXTRAS_PER_SLIDE) {
+        const kids = Array.from(els[0].children);
+        for (let i = 0; i < kids.length; i += EXTRAS_PER_SLIDE) list.push({ els, kids: kids.slice(i, i + EXTRAS_PER_SLIDE) });
+      } else list.push({ els, kids: null });
     });
+    // Bagian yang tidak ada di rencana tetap tampil sebagai slide sendiri.
+    Array.from(app.children).forEach((el) => { if (!used.has(el) && !el.classList.contains('alert')) list.push({ els: [el], kids: null }); });
     return list;
   }
 
   function clearHidden() {
     app.querySelectorAll('.slide-hidden').forEach((x) => x.classList.remove('slide-hidden'));
-    Array.from(app.children).forEach((x) => { x.style.transform = ''; });
+    app.style.transform = '';
+    app.style.width = '';
   }
 
   // Slide 1280×720 diskalakan utuh agar pas di layar (letterbox), seperti tampilan slideshow PowerPoint.
@@ -47,16 +61,29 @@
     frame.style.transform = `translate(-50%, -50%) scale(${s.toFixed(4)})`;
   }
 
-  // Isi slide diskalakan agar memenuhi area konten (maks 1.5×) dan ditengahkan.
-  function fitContent(el) {
-    el.style.transform = '';
+  // Isi slide memenuhi area konten: bila terlalu tinggi, lebar tata letak diperlebar dulu (grafik ikut melebar)
+  // supaya setelah diperkecil tetap memenuhi lebar slide; bila isinya sedikit, diperbesar (maks 1.4×) dan ditengahkan.
+  let fitToken = 0;
+  function fitContent() {
+    const token = ++fitToken;
     const cs = getComputedStyle(body);
-    const availH = body.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 10;
+    const availH = body.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 6;
     const availW = body.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    const h = Math.max(1, el.scrollHeight), w = Math.max(1, el.offsetWidth);
-    const s = Math.min(availH / h, availW / w, 1.5);
-    const dy = Math.max(0, (availH - h * s) / 2);
-    el.style.transform = `translateY(${dy.toFixed(0)}px) scale(${s.toFixed(3)})`;
+    app.style.transform = '';
+    app.style.width = availW + 'px';
+    const s0 = availH / Math.max(1, app.scrollHeight);
+    const place = () => {
+      if (token !== fitToken) return;
+      const h = Math.max(1, app.scrollHeight), w = Math.max(1, app.offsetWidth);
+      const s = Math.min(availH / h, availW / w, 1.4);
+      const dx = (availW - w * s) / 2, dy = Math.max(0, (availH - h * s) / 2);
+      app.style.transform = `translate(${dx.toFixed(0)}px, ${dy.toFixed(0)}px) scale(${s.toFixed(3)})`;
+    };
+    if (s0 < 1) {
+      app.style.width = Math.min(availW / s0, availW * 1.9).toFixed(0) + 'px';
+      document.dispatchEvent(new CustomEvent('survey:resize-charts'));
+      setTimeout(place, 120);
+    } else place();
   }
 
   function show() {
@@ -66,14 +93,24 @@
     clearHidden();
     Array.from(app.children).forEach((x) => x.classList.add('slide-hidden'));
     const s = st.list[st.idx];
-    s.el.classList.remove('slide-hidden');
-    if (s.kids) Array.from(s.el.children).forEach((k) => k.classList.toggle('slide-hidden', !s.kids.includes(k)));
+    s.els.forEach((el) => el.classList.remove('slide-hidden'));
+    if (s.kids) Array.from(s.els[0].children).forEach((k) => k.classList.toggle('slide-hidden', !s.kids.includes(k)));
+    compactItems();
     updateHead(s);
     updateFoot();
     fitStage();
     // Grafik menyesuaikan lebar area slide dulu, baru isi diskalakan.
-    window.dispatchEvent(new Event('resize'));
-    setTimeout(() => fitContent(s.el), 180);
+    document.dispatchEvent(new CustomEvent('survey:resize-charts'));
+    setTimeout(fitContent, 160);
+  }
+
+  // Grafik skor per indikator: label dipotong satu baris agar banyak indikator muat di tinggi slide.
+  function compactItems() {
+    const el = document.getElementById('cItems');
+    const inst = el && window.echarts && echarts.getInstanceByDom(el);
+    if (!inst || el.closest('.slide-hidden')) return;
+    const y = (inst.getOption().yAxis || [])[0];
+    if (y && y.type === 'category') inst.setOption({ yAxis: { axisLabel: { overflow: 'truncate', width: 300, lineHeight: 12, fontSize: 11 } } });
   }
 
   // Tab divisi di setiap slide: sama dengan tab navigasi dashboard, klik untuk lompat ke divisi itu.
@@ -85,10 +122,11 @@
 
   // Judul & insight diambil dari data-title / data-insight yang diisi dashboard dari data terkini.
   function updateHead(s) {
-    let title = s.el.dataset.title || '';
-    let insight = s.el.dataset.insight || '';
+    let title = s.els.map((e) => e.dataset.title).filter(Boolean).join(' · ');
+    let insight = s.els.map((e) => e.dataset.insight).filter(Boolean).join(' ');
     if (s.kids) {
-      title = s.kids.map((k) => (k.querySelector('h2') || {}).textContent || '').filter(Boolean).join(' · ') || title;
+      const parts = st.list.filter((x) => x.kids && x.els[0] === s.els[0]);
+      if (parts.length > 1) title += ` (${parts.indexOf(s) + 1}/${parts.length})`;
       insight = s.kids.map((k) => k.dataset.insight || '').filter(Boolean).join(' ');
     }
     renderTabs();
@@ -164,7 +202,8 @@
     document.body.classList.remove('presenting');
     stage.hidden = true;
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
-    window.dispatchEvent(new Event('resize'));
+    // Gambar ulang dashboard agar grafik kembali ke ukuran & label normal.
+    $id('fArea').dispatchEvent(new Event('change'));
   }
 
   function toggleFullscreen() {
@@ -209,7 +248,7 @@
     if (!st.on) return;
     fitStage();
     clearTimeout(rt);
-    rt = setTimeout(() => { const s = st.list[st.idx]; if (s) fitContent(s.el); }, 220);
+    rt = setTimeout(() => { if (st.list[st.idx]) { document.dispatchEvent(new CustomEvent('survey:resize-charts')); setTimeout(fitContent, 120); } }, 220);
   });
 
   $id('btnPresent').addEventListener('click', enter);

@@ -561,6 +561,7 @@
           </label>
         </div>
         <div class="table-wrap" id="idxTable"></div>
+        <div class="pres-only pres-table" id="idxTablePres"></div>
         <details class="outline" ${state.ui.outlineOpen ? 'open' : ''}>
           <summary><h3>Outline survey &amp; jumlah responden 2021–${CFG.year}</h3></summary>
           ${outlineHtml(d, an)}
@@ -583,6 +584,7 @@
     const drawTable = () => { $('#idxTable').innerHTML = indexTableHtml(d, an, sortSel.value); };
     sortSel.addEventListener('change', () => { state.ui.sort = sortSel.value; drawTable(); });
     drawTable();
+    $('#idxTablePres').innerHTML = presTableHtml(d, an);
 
     miniGauge('kGauge', an.index[0], '#ffffff', 'rgba(255,255,255,.55)', { fontSize: 24, width: 12, textColor: '#ffffff', track: 'rgba(255,255,255,.22)' });
     ec('kArea', {
@@ -742,6 +744,26 @@
       an.items.filter((i) => !i.overall).sort(key).forEach((it) => { body += row(it); });
     }
     return `<table class="idx-table">${head}<tbody>${totalRow}${body}</tbody></table>`;
+  }
+
+  // Tabel ringkas khusus presentasi: Total 2025/2026/Gap + % puas, dibagi dua kolom agar muat satu slide.
+  function presTableHtml(d, an) {
+    const prevIdx = d.indexHistory[CFG.prevYear] || [];
+    const rows = [`<tr class="row-index"><td class="left">INDEX ${esc(d.name.toUpperCase())}</td><td class="num prev">${f2(prevIdx[0])}</td>${scoreCell(an.index[0])}<td class="num">${gapHtml(an.index[0], prevIdx[0])}</td><td class="num">${an.n}</td></tr>`];
+    an.subs.forEach((sb) => {
+      if (an.subs.length > 1) {
+        const p = (sb.hist[CFG.prevYear] || [])[0];
+        rows.push(`<tr class="row-sub"><td class="left">${esc(sb.name)}</td><td class="num prev">${f2(p)}</td>${scoreCell(sb.value ? sb.value[0] : null)}<td class="num">${gapHtml(sb.value ? sb.value[0] : null, p)}</td><td></td></tr>`);
+      }
+      sb.items.slice().sort((a, b) => (b.stats.mean ?? -1) - (a.stats.mean ?? -1)).forEach((it) => {
+        const b = (it.b25 || [])[0];
+        rows.push(`<tr><td class="left">${esc(it.label)}</td><td class="num prev">${f2(b)}</td>${scoreCell(it.stats.mean)}<td class="num">${gapHtml(it.stats.mean, b)}</td><td class="num">${pct(it.stats.top2)}</td></tr>`);
+      });
+    });
+    const head = `<thead><tr><th class="left">Indikator</th><th>${CFG.prevYear}</th><th>${CFG.year}</th><th>Gap</th><th>% Puas</th></tr></thead>`;
+    const half = rows.length > 14 ? Math.ceil(rows.length / 2) : rows.length;
+    return [rows.slice(0, half), rows.slice(half)].filter((r) => r.length)
+      .map((r) => `<div class="table-wrap"><table class="idx-table">${head}<tbody>${r.join('')}</tbody></table></div>`).join('');
   }
 
   function drawTrend(d, an, color) {
@@ -1104,6 +1126,7 @@
     window.addEventListener('hashchange', onRoute);
     let rt = null;
     window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => state.charts.forEach((c) => c.resize()), 120); });
+    document.addEventListener('survey:resize-charts', () => state.charts.forEach((c) => c.resize()));
     ['fArea', 'fDiv'].forEach((id) => $('#' + id).addEventListener('change', (e) => {
       state.filters[{ fArea: 'area', fDiv: 'div' }[id]] = e.target.value;
       render(false);

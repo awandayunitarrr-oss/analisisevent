@@ -341,9 +341,30 @@ body.presenting .topbar, body.presenting .filters, body.presenting .footer { dis
 body.presenting::before { display: none; }
 body.presenting .present-bar { display: flex; }
 body.presenting #app { max-width: none; width: 100%; padding: 0; margin: 0; }
-body.presenting #app > * { transform-origin: top center; margin-bottom: 0; animation: slide-in .35s ease; }
+body.presenting #app { transform-origin: top left; }
+body.presenting #app > * { animation: slide-in .35s ease; }
 body.presenting .slide-hidden { display: none !important; }
-body.presenting .comment-list { max-height: 210px; }
+/* Di dalam slide: jarak & tinggi grafik dipadatkan supaya beberapa bagian muat dalam satu slide. */
+body.presenting #app > * { margin-bottom: 12px; }
+body.presenting .grid-2, body.presenting .div-cards { gap: 12px; margin-bottom: 12px; }
+body.presenting .card { padding: 14px 16px; margin-bottom: 12px; }
+body.presenting .band { padding: 18px 22px; gap: 12px; margin-bottom: 12px; }
+body.presenting .band-mascot { height: 110px; }
+body.presenting .h-280, body.presenting .h-300, body.presenting .h-320, body.presenting .h-360 { height: 250px; }
+body.presenting .h-240, body.presenting .h-260 { height: 210px; }
+body.presenting .comments-top .h-260 { height: 190px; }
+body.presenting .comment-list { max-height: 150px; }
+body.presenting #cItems { height: 480px !important; }
+.pres-only { display: none; }
+body.presenting .pres-only { display: grid; }
+body.presenting .pres-table { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 12px; }
+body.presenting .pres-table .table-wrap { margin-top: 6px; }
+body.presenting [data-s="dv-table"] #idxTable, body.presenting [data-s="dv-table"] details.outline, body.presenting [data-s="dv-table"] .inline { display: none; }
+body.presenting .idx-table { font-size: 12px; }
+body.presenting .idx-table td, body.presenting .idx-table th { padding: 4px 6px; }
+body.presenting .idx-table td.left { min-width: 200px; }
+body.presenting [data-s="dv-profile"] .grid-3 { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
+body.presenting [data-s="dv-profile"] .h-240 { height: 190px; }
 body.presenting .band-mascot { animation: none; }
 @keyframes slide-in { from { opacity: 0; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
 @media (prefers-reduced-motion: reduce) { body.presenting #app > * { animation: none; } }
