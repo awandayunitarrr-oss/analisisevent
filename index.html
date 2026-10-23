@@ -47,15 +47,25 @@
     <div class="loading">Memuat data survey…</div>
   </main>
 
-  <header class="slide-head" id="slideHead" aria-live="polite">
-    <div class="slide-head-top">
-      <img src="assets/img/logo-mpm.png" alt="MPM Distributor" width="190" height="96">
-      <span class="slide-eyebrow" id="sEyebrow"></span>
-      <span class="slide-filters" id="sFilters"></span>
+  <div class="slide-stage" id="slideStage" hidden>
+    <div class="slide-frame" id="slideFrame" role="region" aria-label="Slide presentasi">
+      <header class="s-head">
+        <div class="s-top">
+          <img src="assets/img/logo-mpm.png" alt="MPM Distributor" width="190" height="96">
+          <nav class="s-tabs" id="sTabs" aria-label="Pindah divisi"></nav>
+          <span class="slide-filters" id="sFilters"></span>
+        </div>
+        <h2 id="sTitle"></h2>
+        <p class="slide-insight" id="sInsight"></p>
+      </header>
+      <div class="s-body" id="slideBody"></div>
+      <footer class="s-foot">
+        <span>MPM Distributor · Survey Kepuasan Layanan Divisi 2026</span>
+        <span id="sPage"></span>
+        <span class="s-progress"><span id="sProgress"></span></span>
+      </footer>
     </div>
-    <h2 id="sTitle"></h2>
-    <p class="slide-insight" id="sInsight"></p>
-  </header>
+  </div>
 
   <div class="present-bar" role="toolbar" aria-label="Kontrol presentasi">
     <button id="pExit" class="pbtn" type="button" title="Keluar (Esc)">✕</button>
@@ -65,8 +75,7 @@
     <button id="pFull" class="pbtn" type="button" title="Layar penuh (F)">⛶</button>
     <label class="p-filter" title="Filter area kerja"><span>Area</span><select id="pArea" aria-label="Filter area kerja"></select></label>
     <label class="p-filter" title="Filter divisi responden"><span>Divisi</span><select id="pDiv" aria-label="Filter divisi responden"></select></label>
-    <span class="p-progress"><span id="pProgress"></span></span>
-  </div>
+      </div>
 
   <footer class="footer container">
     <p>Skala kepuasan 1–5 · Sangat puas = 5, Puas = 4, Antara iya dan tidak = 3, Tidak puas = 2, Sangat tidak puas = 1.

@@ -18,7 +18,7 @@ gap vs 2025, sub-kategori, tren index per area, kritik & saran, serta prioritas 
 
 ## Mode presentasi
 
-Klik **▶ Presentasi** di header. Setiap bagian halaman tampil sebagai satu slide layar penuh, berurutan dari Ringkasan lalu tiap divisi.
+Klik **▶ Presentasi** di header. Setiap bagian halaman tampil sebagai satu slide **16:9 berukuran 1280×720** (sama dengan PowerPoint widescreen), diskalakan pas ke layar, berurutan dari Ringkasan lalu tiap divisi. Setiap slide memuat logo, tab divisi yang bisa diklik untuk lompat ke divisi lain, judul, insight, isi, dan footer bernomor.
 
 | Tombol | Fungsi |
 |---|---|
