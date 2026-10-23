@@ -41,11 +41,20 @@
   function destroyCharts() { state.charts.forEach((c) => c.destroy()); state.charts = []; }
   function chart(el, cfg) { if (!el) return null; const c = new Chart(el, cfg); state.charts.push(c); return c; }
 
+  // Warna teks/grid/garis grafik diambil dari token CSS supaya mengikuti tema terang/gelap.
+  function applyThemeColors() {
+    const css = getComputedStyle(document.documentElement);
+    const v = (n) => css.getPropertyValue(n).trim();
+    COLORS.text = v('--ink-2'); COLORS.grid = v('--line'); COLORS.surface = v('--surface');
+    COLORS.prev = v('--prev'); COLORS.cur = v('--cur'); COLORS.total = v('--ink');
+    Chart.defaults.color = COLORS.text;
+    Chart.defaults.borderColor = COLORS.grid;
+  }
+
   if (window.Chart) {
     Chart.defaults.font.family = "'Plus Jakarta Sans', system-ui, sans-serif";
     Chart.defaults.font.size = 12;
-    Chart.defaults.color = COLORS.text;
-    Chart.defaults.borderColor = COLORS.grid;
+    applyThemeColors();
     Chart.defaults.plugins.legend.labels.boxWidth = 12;
     Chart.defaults.plugins.legend.labels.boxHeight = 12;
     Chart.defaults.plugins.tooltip.backgroundColor = '#1f2a37';
@@ -113,10 +122,10 @@
   /* ───────── routing ───────── */
   function buildTabs() {
     const tabs = [{ id: 'ringkasan', name: 'Ringkasan' }].concat(CFG.DIVISIONS.map((d) => ({ id: d.id, name: d.name })));
-    $('#tabs').innerHTML = tabs.map((t) => `<a href="#/${t.id}" data-id="${t.id}">${esc(t.name)}</a>`).join('');
+    $('#tabs').innerHTML = tabs.map((t) => `<a href="#${t.id}" data-id="${t.id}">${esc(t.name)}</a>`).join('');
   }
   function onRoute() {
-    const id = (location.hash.replace(/^#\/?/, '') || 'ringkasan').split('/')[0];
+    const id = (location.hash.replace(/^#\/?/, '') || 'ringkasan').split(/[/?]/)[0];
     state.route = id;
     document.querySelectorAll('#tabs a').forEach((a) => a.classList.toggle('active', a.dataset.id === id));
     if (state.sheets) render(true);
@@ -124,6 +133,7 @@
 
   function render(scrollTop) {
     destroyCharts();
+    applyThemeColors();
     $('#filterNote').textContent = filterLabel();
     const div = CFG.DIVISIONS.find((d) => d.id === state.route);
     if (div) renderDivision(div); else renderOverview();
@@ -217,7 +227,7 @@
       </section>
     `;
 
-    document.querySelectorAll('[data-go]').forEach((tr) => tr.addEventListener('click', () => { location.hash = '#/' + tr.dataset.go; }));
+    document.querySelectorAll('[data-go]').forEach((tr) => tr.addEventListener('click', () => { location.hash = '#' + tr.dataset.go; }));
 
     chart($('#cOverview'), {
       type: 'bar',
@@ -239,7 +249,7 @@
         datasets: rows.map((r, i) => ({
           label: r.d.name,
           data: days.map((day) => r.resp.filter((x) => x.date && x.date.toDateString() === day.toDateString()).length),
-          backgroundColor: COLORS.series[i], borderColor: '#fff', borderWidth: 1, borderRadius: 2, maxBarThickness: 28,
+          backgroundColor: COLORS.series[i], borderColor: COLORS.surface, borderWidth: 1, borderRadius: 2, maxBarThickness: 28,
         })),
       },
       options: { scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, title: { display: true, text: 'Jumlah respons' } } }, plugins: { tooltip: { mode: 'index' } } },
@@ -251,7 +261,7 @@
   }
   function rankList(list) {
     if (!list.length) return '<p class="muted">Belum ada data.</p>';
-    return `<ol class="rank">${list.map((i) => `<li><a href="#/${i.divId}"><span class="rank-label">${esc(i.label)}<span class="muted small"> · ${esc(i.divName)} · n=${i.stats.n}</span></span><span class="rank-val">${f2(i.stats.mean)}</span></a></li>`).join('')}</ol>`;
+    return `<ol class="rank">${list.map((i) => `<li><a href="#${i.divId}"><span class="rank-label">${esc(i.label)}<span class="muted small"> · ${esc(i.divName)} · n=${i.stats.n}</span></span><span class="rank-val">${f2(i.stats.mean)}</span></a></li>`).join('')}</ol>`;
   }
 
   /* ───────── HALAMAN DIVISI ───────── */
@@ -467,7 +477,7 @@
         datasets: labels.map((l, k) => ({
           label: l,
           data: years.map((y) => (y === CFG.year ? A.round2(an.index[k]) : (d.indexHistory[y] || [])[k] ?? null)),
-          borderColor: k === 0 ? '#0d366b' : COLORS.series[k - 1], backgroundColor: k === 0 ? '#0d366b' : COLORS.series[k - 1],
+          borderColor: k === 0 ? COLORS.total : COLORS.series[k - 1], backgroundColor: k === 0 ? COLORS.total : COLORS.series[k - 1],
           borderWidth: k === 0 ? 3 : 2, pointRadius: 4, pointHoverRadius: 6, spanGaps: true, tension: 0.2,
         })),
       },
@@ -476,8 +486,10 @@
   }
 
   function drawSubs(d, an) {
-    const list = an.groups.map((g) => ({ name: g.name, value: g.value, hist: g.hist }))
-      .concat(an.subs.filter((s) => !s.overall && s.value));
+    const subs = an.subs.filter((s) => !s.overall && s.value);
+    // Divisi tanpa sub-kategori: pembandingnya adalah index total tahun lalu.
+    if (subs.length === 1 && !Object.keys(subs[0].hist).length) subs[0] = Object.assign({}, subs[0], { hist: d.indexHistory });
+    const list = an.groups.map((g) => ({ name: g.name, value: g.value, hist: g.hist })).concat(subs);
     chart($('#cSubs'), {
       type: 'bar',
       data: {
@@ -487,7 +499,7 @@
           { label: String(CFG.year), data: list.map((s) => A.round2(s.value[0])), backgroundColor: COLORS.cur, borderRadius: 4, maxBarThickness: 16 },
         ],
       },
-      options: { indexAxis: 'y', scales: { x: { min: axisMin(list.flatMap((s) => [(s.hist[CFG.prevYear] || [])[0], s.value[0]])), max: 5 }, y: { grid: { display: false }, ticks: { callback(v) { return wrap(this.getLabelForValue(v), 26); } } } },
+      options: { indexAxis: 'y', scales: { x: { min: axisMin(list.flatMap((s) => [(s.hist[CFG.prevYear] || [])[0], s.value[0]])), max: 5, ticks: { stepSize: 0.25 } }, y: { grid: { display: false }, ticks: { callback(v) { return wrap(this.getLabelForValue(v), 26); } } } },
         plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${f2(c.raw)}` } } } },
     });
   }
@@ -517,7 +529,7 @@
         type: 'bar',
         data: {
           labels,
-          datasets: names.map((nm, k) => ({ label: nm, data: items.map((i) => (i.stats.n ? (i.stats.dist[k] / i.stats.n) * 100 : 0)), backgroundColor: COLORS.likert[k], borderColor: '#fff', borderWidth: 1, maxBarThickness: 20, _counts: items.map((i) => i.stats.dist[k]) })),
+          datasets: names.map((nm, k) => ({ label: nm, data: items.map((i) => (i.stats.n ? (i.stats.dist[k] / i.stats.n) * 100 : 0)), backgroundColor: COLORS.likert[k], borderColor: COLORS.surface, borderWidth: 1, maxBarThickness: 20, _counts: items.map((i) => i.stats.dist[k]) })),
         },
         options: { indexAxis: 'y', scales: { x: { stacked: true, max: 100, ticks: { callback: (v) => v + '%' } }, y: Object.assign({ stacked: true }, yTicks) },
           plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${Math.round(c.raw)}% (${c.dataset._counts[c.dataIndex]} org)` } } } },
@@ -532,7 +544,7 @@
           { label: String(CFG.year), data: items.map((i) => A.round2(i.stats.mean)), backgroundColor: COLORS.cur, borderRadius: 4, maxBarThickness: 12 },
         ],
       },
-      options: { indexAxis: 'y', scales: { x: { min: axisMin(items.flatMap((i) => [i.b25 && i.b25[0], i.stats.mean])), max: 5 }, y: yTicks },
+      options: { indexAxis: 'y', scales: { x: { min: axisMin(items.flatMap((i) => [i.b25 && i.b25[0], i.stats.mean])), max: 5, ticks: { stepSize: 0.25 } }, y: yTicks },
         plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${f2(c.raw)}`, afterBody: (ctx) => { const it = items[ctx[0].dataIndex]; return [`n = ${it.stats.n}`, `% puas = ${pct(it.stats.top2)}`].concat(it.note ? [it.note] : []); } } } } },
     });
   }
@@ -596,8 +608,8 @@
         chart(el, {
           type: 'bar',
           data: { labels: [String(CFG.year)].concat(x.prev ? [String(CFG.prevYear)] : []), datasets: [
-            { label: 'Ya', data: [ans.length ? (ya / ans.length) * 100 : 0].concat(x.prev ? [x.prev.Ya * 100] : []), backgroundColor: COLORS.series[0], borderColor: '#fff', borderWidth: 1, maxBarThickness: 26 },
-            { label: 'Tidak', data: [ans.length ? ((ans.length - ya) / ans.length) * 100 : 0].concat(x.prev ? [(1 - x.prev.Ya) * 100] : []), backgroundColor: COLORS.series[1], borderColor: '#fff', borderWidth: 1, maxBarThickness: 26 },
+            { label: 'Ya', data: [ans.length ? (ya / ans.length) * 100 : 0].concat(x.prev ? [x.prev.Ya * 100] : []), backgroundColor: COLORS.series[0], borderColor: COLORS.surface, borderWidth: 1, maxBarThickness: 26 },
+            { label: 'Tidak', data: [ans.length ? ((ans.length - ya) / ans.length) * 100 : 0].concat(x.prev ? [(1 - x.prev.Ya) * 100] : []), backgroundColor: COLORS.series[1], borderColor: COLORS.surface, borderWidth: 1, maxBarThickness: 26 },
           ] },
           options: { indexAxis: 'y', scales: { x: { stacked: true, max: 100, ticks: { callback: (v) => v + '%' } }, y: { stacked: true, grid: { display: false } } }, plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${Math.round(c.raw)}%` } } } },
         });
@@ -610,7 +622,7 @@
         const names = ['Sangat tidak penting', 'Tidak penting', 'Antara', 'Penting', 'Sangat penting'];
         chart(el, {
           type: 'bar',
-          data: { labels: ['Jawaban'], datasets: names.map((nm, i) => ({ label: nm, data: [scores.length ? (dist[i] / scores.length) * 100 : 0], backgroundColor: COLORS.likert[i], borderColor: '#fff', borderWidth: 1, maxBarThickness: 30 })) },
+          data: { labels: ['Jawaban'], datasets: names.map((nm, i) => ({ label: nm, data: [scores.length ? (dist[i] / scores.length) * 100 : 0], backgroundColor: COLORS.likert[i], borderColor: COLORS.surface, borderWidth: 1, maxBarThickness: 30 })) },
           options: { indexAxis: 'y', scales: { x: { stacked: true, max: 100, ticks: { callback: (v) => v + '%' } }, y: { stacked: true, display: false } }, plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${Math.round(c.raw)}%` } } } },
         });
       } else if (x.type === 'nps') {
@@ -739,6 +751,9 @@
     });
     $('#btnRefresh').addEventListener('click', () => load('live'));
     $('#fileInput').addEventListener('change', (e) => { if (e.target.files[0]) load('file', e.target.files[0]); e.target.value = ''; });
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', () => { if (state.sheets) render(false); });
+    new MutationObserver(() => { if (state.sheets) render(false); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     onRoute();
     load('live');
     const mins = CFG.SOURCE.autoRefreshMinutes;
