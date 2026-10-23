@@ -144,6 +144,7 @@
     const div = CFG.DIVISIONS.find((d) => d.id === state.route);
     if (div) renderDivision(div); else renderOverview();
     if (scrollTop) window.scrollTo({ top: 0 });
+    document.dispatchEvent(new CustomEvent('survey:rendered'));
   }
 
   function analyzeAll() {

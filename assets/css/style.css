@@ -292,6 +292,30 @@ mark { background: var(--mark); color: inherit; padding: 0 2px; border-radius: 3
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .band-mascot { animation: none; } }
 
+/* ── mode presentasi ── */
+.btn-present { background: #ffffff; color: var(--head-1); }
+.btn-present:hover { background: #ffe4e6; }
+.present-bar { display: none; position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 40;
+  align-items: center; gap: 6px; padding: 6px 8px; border-radius: 999px; background: linear-gradient(110deg, var(--head-1), var(--head-2)); color: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .3); max-width: calc(100vw - 32px); overflow: hidden; }
+.pbtn { font: inherit; font-size: .95rem; font-weight: 800; width: 38px; height: 38px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, .14); color: #fff; cursor: pointer; flex: none; }
+.pbtn:hover:not(:disabled) { background: rgba(255, 255, 255, .28); }
+.pbtn:disabled { opacity: .35; cursor: default; }
+.p-info { display: flex; flex-direction: column; align-items: center; min-width: 120px; padding: 0 8px; font-size: .78rem; line-height: 1.2; white-space: nowrap; }
+.p-info b { font-size: .9rem; }
+.p-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, .2); }
+.p-progress span { display: block; height: 100%; width: 0; background: #facc15; transition: width .3s; }
+body.presenting { overflow: hidden; }
+body.presenting .topbar, body.presenting .filters, body.presenting .footer { display: none; }
+body.presenting::before { display: none; }
+body.presenting .present-bar { display: flex; }
+body.presenting #app { max-width: 1180px; height: 100vh; overflow: visible; padding-block: 24px 80px; }
+body.presenting #app > * { transform-origin: top center; margin-bottom: 0; animation: slide-in .35s ease; }
+body.presenting .slide-hidden { display: none !important; }
+body.presenting .comment-list { max-height: 54vh; }
+@keyframes slide-in { from { opacity: 0; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
+@media (prefers-reduced-motion: reduce) { body.presenting #app > * { animation: none; } }
+
 @media print {
   .topbar, .filters, .seg, #sortSel, .source { display: none !important; }
   body { background: var(--surface); }

@@ -22,6 +22,7 @@
       </a>
       <div class="source">
         <span id="sourceStatus" class="pill pill-muted">Memuat data…</span>
+        <button id="btnPresent" class="btn btn-present" type="button" title="Tampilkan sebagai slide layar penuh">▶ Presentasi</button>
         <button id="btnRefresh" class="btn btn-ghost" type="button" title="Muat ulang data dari Google Sheets">↻ Refresh</button>
         <button class="btn btn-ghost" type="button" onclick="window.print()" title="Cetak / simpan PDF">⎙ Cetak</button>
       </div>
@@ -46,6 +47,15 @@
     <div class="loading">Memuat data survey…</div>
   </main>
 
+  <div class="present-bar" role="toolbar" aria-label="Kontrol presentasi">
+    <button id="pExit" class="pbtn" type="button" title="Keluar (Esc)">✕</button>
+    <button id="pPrev" class="pbtn" type="button" title="Sebelumnya (←)">◀</button>
+    <span class="p-info"><b id="pTitle"></b><span id="pCount"></span></span>
+    <button id="pNext" class="pbtn" type="button" title="Berikutnya (→ / Spasi)">▶</button>
+    <button id="pFull" class="pbtn" type="button" title="Layar penuh (F)">⛶</button>
+    <span class="p-progress"><span id="pProgress"></span></span>
+  </div>
+
   <footer class="footer container">
     <p>Skala kepuasan 1–5 · Sangat puas = 5, Puas = 4, Antara iya dan tidak = 3, Tidak puas = 2, Sangat tidak puas = 1.
       Jawaban “Tidak pernah” tidak dihitung. Index = rata-rata skor seluruh indikator.</p>
@@ -62,5 +72,6 @@
   <script src="assets/js/data.js"></script>
   <script src="assets/js/analytics.js"></script>
   <script src="assets/js/app.js"></script>
+  <script src="assets/js/present.js"></script>
 </body>
 </html>

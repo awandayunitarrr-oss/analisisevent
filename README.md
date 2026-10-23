@@ -16,6 +16,21 @@ gap vs 2025, sub-kategori, tren index per area, kritik & saran, serta prioritas 
 - **Filter dinamis** – area kerja dan divisi responden (berlaku untuk semua angka & grafik).
 - **Data live** dari Google Sheets (refresh otomatis tiap 5 menit), dengan cadangan snapshot lokal. Tombol cetak/PDF.
 
+## Mode presentasi
+
+Klik **▶ Presentasi** di header. Setiap bagian halaman tampil sebagai satu slide layar penuh, berurutan dari Ringkasan lalu tiap divisi.
+
+| Tombol | Fungsi |
+|---|---|
+| → / Spasi / PageDown | slide berikutnya (lanjut ke divisi berikutnya setelah slide terakhir) |
+| ← / PageUp | slide sebelumnya |
+| ↓ / ↑ | lompat ke divisi berikutnya / sebelumnya |
+| Home / End | slide pertama / terakhir divisi ini |
+| F | layar penuh |
+| Esc | keluar |
+
+Di ponsel/tablet: geser kiri/kanan. Filter area & divisi yang aktif tetap berlaku selama presentasi.
+
 ## Sumber data
 
 Data dibaca langsung dari spreadsheet *Monitoring Survey Layanan 2026* (ID di `assets/js/config.js` → `SOURCE.spreadsheetId`).
@@ -29,9 +44,15 @@ Memperbarui snapshot (nama responden, GPS & link dibuang):
 python tools/build_snapshot.py "Monitoring Survey Layanan 2026.xlsx"
 ```
 
-## Menjalankan
+## Menjalankan & deploy
 
-Website statis tanpa build: buka `index.html` di browser, atau aktifkan **GitHub Pages** (Settings → Pages → Deploy from branch, folder `/`).
+Website statis tanpa build: buka `index.html` di browser.
+
+**Vercel** (disarankan): di [vercel.com/new](https://vercel.com/new) pilih *Import Git Repository* → repo ini →
+Framework Preset **Other**, Build Command & Output Directory dikosongkan → **Deploy**.
+Setiap push ke `main` otomatis ter-deploy ulang. Pengaturan cache ada di `vercel.json`.
+
+**GitHub Pages**: Settings → Pages → Deploy from branch → `main` / `(root)`.
 
 ## Menyesuaikan
 
