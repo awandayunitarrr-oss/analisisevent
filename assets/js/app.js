@@ -11,12 +11,12 @@
   const DIV_GRAD = { it: '#06b6d4', helpdesk: '#facc15', simo: '#22d3ee', hcgs: '#ec4899', corpsec: '#f97316', purchasing: '#84cc16' };
   const PALETTE = ['#2563eb', '#f97316', '#14b8a6', '#8b5cf6', '#ec4899', '#22c55e', '#f59e0b', '#0ea5e9', '#ef4444', '#6366f1'];
   const AREA_COLOR = ['#2563eb', '#f97316', '#14b8a6'];
-  const YEAR_COLOR = { prev: '#f97316', cur: '#2563eb' };
+  const YEAR_COLOR = { prev: '#94a3b8', cur: '#dc2626' };
   const LIKERT = ['#dc2626', '#fb923c', '#cbd5e1', '#60a5fa', '#2563eb'];
   const CAT_COLOR = { 'cat-1': '#dc2626', 'cat-2': '#f97316', 'cat-3': '#f59e0b', 'cat-4': '#0ea5e9', 'cat-5': '#16a34a' };
   const T = {};
 
-  const state = { sheets: null, source: '', loadedAt: null, prepared: {}, filters: { area: '', div: '', jab: '' }, charts: [], route: 'ringkasan', ui: {} };
+  const state = { sheets: null, source: '', loadedAt: null, prepared: {}, filters: { area: '', div: '' }, charts: [], route: 'ringkasan', ui: {} };
 
   /* ───────── util ───────── */
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -83,7 +83,7 @@
   }
   function filtered(prep) {
     const f = state.filters;
-    return prep.respondents.filter((r) => (!f.area || r.area === f.area) && (!f.div || r.div === f.div) && (!f.jab || r.jab === f.jab));
+    return prep.respondents.filter((r) => (!f.area || r.area === f.area) && (!f.div || r.div === f.div));
   }
   function fillFilterOptions() {
     const all = Object.values(state.prepared).flatMap((p) => p.respondents);
@@ -94,11 +94,10 @@
     };
     fill($('#fArea'), AREAS, 'Semua area');
     fill($('#fDiv'), uniq('div'), 'Semua divisi');
-    fill($('#fJab'), uniq('jab'), 'Semua jabatan');
   }
   function filterLabel() {
     const f = state.filters;
-    const parts = [f.area, f.div, f.jab].filter(Boolean);
+    const parts = [f.area, f.div].filter(Boolean);
     return parts.length ? 'Filter aktif: ' + parts.join(' · ') : '';
   }
 
@@ -130,7 +129,7 @@
   /* ───────── routing ───────── */
   function buildTabs() {
     const tabs = [{ id: 'ringkasan', name: 'Ringkasan' }].concat(CFG.DIVISIONS.map((d) => ({ id: d.id, name: d.name })));
-    $('#tabs').innerHTML = tabs.map((t) => `<a href="#${t.id}" data-id="${t.id}" style="--dc:${DIV_COLOR[t.id] || '#38bdf8'}"><span class="dot"></span>${esc(t.name)}</a>`).join('');
+    $('#tabs').innerHTML = tabs.map((t) => `<a href="#${t.id}" data-id="${t.id}" style="--dc:${DIV_COLOR[t.id] || '#ffffff'}"><span class="dot"></span>${esc(t.name)}</a>`).join('');
   }
   function onRoute() {
     state.route = (location.hash.replace(/^#\/?/, '') || 'ringkasan').split(/[/?]/)[0];
@@ -182,7 +181,7 @@
     }
 
     $('#app').innerHTML = `
-      <section class="band" style="--dc:#2563eb;--dc2:#8b5cf6">
+      <section class="band">
         <div class="band-text">
           <p class="eyebrow">Survey Pengukuran Kepuasan Divisi · Karyawan MPM ${CFG.year}</p>
           <h1>Ringkasan Index Pelayanan Divisi ${CFG.year}</h1>
@@ -214,7 +213,7 @@
       <section class="card insight"><h2>Temuan utama</h2><ul>${insights.map((i) => `<li>${i}</li>`).join('')}</ul></section>
 
       <section class="grid-2">
-        <div class="card"><h2>Perubahan index ${CFG.prevYear} → ${CFG.year}</h2><p class="muted">Dumbbell chart: titik oranye ${CFG.prevYear}, titik biru ${CFG.year}.</p><div class="chart h-320" id="cDumb"></div></div>
+        <div class="card"><h2>Perubahan index ${CFG.prevYear} → ${CFG.year}</h2><p class="muted">Dumbbell chart: titik abu-abu ${CFG.prevYear}, titik merah ${CFG.year}; garis hijau = naik, kuning = turun.</p><div class="chart h-320" id="cDumb"></div></div>
         <div class="card"><h2>Peringkat divisi dari tahun ke tahun</h2><p class="muted">Bump chart: posisi 1 = index tertinggi pada tahun tersebut.</p><div class="chart h-320" id="cBump"></div></div>
       </section>
 
@@ -355,7 +354,7 @@
             const a = api.value(1), b = api.value(2);
             if (a == null || b == null || Number.isNaN(a) || Number.isNaN(b)) return null;
             const p1 = api.coord([a, api.value(0)]), p2 = api.coord([b, api.value(0)]);
-            return { type: 'line', shape: { x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1] }, style: { stroke: b >= a ? fade('#16a34a', 0.55) : fade('#dc2626', 0.55), lineWidth: 5, lineCap: 'round' } };
+            return { type: 'line', shape: { x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1] }, style: { stroke: b >= a ? fade('#16a34a', 0.55) : fade('#f59e0b', 0.7), lineWidth: 5, lineCap: 'round' } };
           }, encode: { y: 0, x: [1, 2] }, data: labels.map((_, i) => [i, prev[i], cur[i]]) },
         { name: String(CFG.prevYear), type: 'scatter', z: 2, symbolSize: 13, color: YEAR_COLOR.prev, itemStyle: { color: YEAR_COLOR.prev, borderColor: T.surface, borderWidth: 2 }, data: prev.map((v, i) => [v, i]) },
         { name: String(CFG.year), type: 'scatter', z: 3, symbolSize: 16, color: opts.color || YEAR_COLOR.cur, itemStyle: { color: opts.color || YEAR_COLOR.cur, borderColor: T.surface, borderWidth: 2 },
@@ -448,7 +447,7 @@
   function renderDivision(d) {
     const prep = state.prepared[d.id];
     if (!prep || prep.missing) { $('#app').innerHTML = `<div class="empty">Sheet "${esc(d.sheet)}" tidak ditemukan di sumber data.</div>`; return; }
-    const color = DIV_COLOR[d.id], color2 = DIV_GRAD[d.id];
+    const color = DIV_COLOR[d.id];
     const resp = filtered(prep);
     const an = A.analyzeDivision(prep, resp);
     const prev = d.indexHistory[CFG.prevYear] || [];
@@ -459,7 +458,7 @@
     state.ui.itemView = state.ui.itemView || 'dumbbell';
 
     $('#app').innerHTML = `
-      <section class="band" style="--dc:${color};--dc2:${color2}">
+      <section class="band">
         <div class="band-text">
           <p class="eyebrow">Survey Pengukuran Kepuasan · ${esc(d.full)}</p>
           <h1>Index Pelayanan ${esc(d.name)} ${CFG.year}</h1>
@@ -474,11 +473,11 @@
       </section>
       ${missingCols.length ? `<div class="alert">Kolom tidak ditemukan di sheet: ${missingCols.map(esc).join('; ')}. Periksa judul kolom pada spreadsheet.</div>` : ''}
 
-      <section class="card insight" style="--dc:${color}"><h2>Temuan utama</h2><ul>${divisionInsights(d, an, prev).map((i) => `<li>${i}</li>`).join('')}</ul></section>
+      <section class="card insight"><h2>Temuan utama</h2><ul>${divisionInsights(d, an, prev).map((i) => `<li>${i}</li>`).join('')}</ul></section>
 
       <section class="grid-2">
         <div class="card"><h2>Tren index per area</h2><p class="muted">${Object.keys(d.indexHistory).length ? 'Index total dan per area kerja, ' + Object.keys(d.indexHistory)[0] + '–' + CFG.year + '.' : 'Pembanding tahun lalu belum tersedia.'}</p><div class="chart h-300" id="cTrend"></div>${d.indexHistoryNote ? `<p class="note">${esc(d.indexHistoryNote)}</p>` : ''}</div>
-        <div class="card"><h2>${an.subs.filter((s) => !s.overall && s.value).length + an.groups.length >= 3 ? 'Radar sub-kategori' : 'Radar indikator'}</h2><p class="muted">Area oranye = ${CFG.prevYear}, area berwarna = ${CFG.year}.</p><div class="chart h-300" id="cRadar"></div></div>
+        <div class="card"><h2>${an.subs.filter((s) => !s.overall && s.value).length + an.groups.length >= 3 ? 'Radar sub-kategori' : 'Radar indikator'}</h2><p class="muted">Garis putus abu-abu = ${CFG.prevYear}, area berwarna = ${CFG.year}.</p><div class="chart h-300" id="cRadar"></div></div>
       </section>
 
       <section class="card">
@@ -745,7 +744,7 @@
       items.forEach((it, y) => cols.forEach((_, x) => { const v = x === 0 ? it.stats.mean : it.stats.area[x - 1]; if (v != null) data.push([x, y, A.round2(v)]); }));
       return heatmap('cItems', cols, labels, data, { labelWidth: 230 });
     }
-    hint.textContent = `Garis hijau = naik, merah = turun dibanding ${CFG.prevYear}. Indikator baru hanya menampilkan titik ${CFG.year}.`;
+    hint.textContent = `Titik abu-abu = ${CFG.prevYear}, titik berwarna = ${CFG.year}. Garis hijau = naik, kuning = turun. Indikator baru hanya menampilkan titik ${CFG.year}.`;
     return dumbbell('cItems', labels, items.map((i) => (i.b25 ? i.b25[0] : null)), items.map((i) => A.round2(i.stats.mean)), {
       color, labelWidth: 230,
       extra: (i) => `<br>n = ${items[i].stats.n} · ${pct(items[i].stats.top2)} puas${items[i].note ? '<br><i>' + esc(items[i].note) + '</i>' : ''}`,
@@ -1015,13 +1014,13 @@
     window.addEventListener('hashchange', onRoute);
     let rt = null;
     window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => state.charts.forEach((c) => c.resize()), 120); });
-    ['fArea', 'fDiv', 'fJab'].forEach((id) => $('#' + id).addEventListener('change', (e) => {
-      state.filters[{ fArea: 'area', fDiv: 'div', fJab: 'jab' }[id]] = e.target.value;
+    ['fArea', 'fDiv'].forEach((id) => $('#' + id).addEventListener('change', (e) => {
+      state.filters[{ fArea: 'area', fDiv: 'div' }[id]] = e.target.value;
       render(false);
     }));
     $('#btnReset').addEventListener('click', () => {
-      state.filters = { area: '', div: '', jab: '' };
-      ['fArea', 'fDiv', 'fJab'].forEach((id) => { $('#' + id).value = ''; });
+      state.filters = { area: '', div: '' };
+      ['fArea', 'fDiv'].forEach((id) => { $('#' + id).value = ''; });
       render(false);
     });
     $('#btnRefresh').addEventListener('click', () => load());

@@ -13,7 +13,7 @@ gap vs 2025, sub-kategori, tren index per area, kritik & saran, serta prioritas 
   tingkat interaksi per unit (CORPSEC).
 - **Kritik & saran** – word cloud, treemap tema otomatis, penyaringan jawaban kosong, pencarian.
 - **Grafik** – ECharts: gauge, dumbbell, bump chart, streamgraph, heatmap, sunburst, radar, waffle, rose, lollipop, treemap.
-- **Filter dinamis** – area kerja, divisi responden, jabatan (berlaku untuk semua angka & grafik).
+- **Filter dinamis** – area kerja dan divisi responden (berlaku untuk semua angka & grafik).
 - **Data live** dari Google Sheets (refresh otomatis tiap 5 menit), dengan cadangan snapshot lokal. Tombol cetak/PDF.
 
 ## Sumber data
