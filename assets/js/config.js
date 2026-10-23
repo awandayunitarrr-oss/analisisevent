@@ -252,9 +252,9 @@ window.SURVEY_CONFIG = {
 
     /* ───────────────────────────── CORPSEC ───────────────────────────── */
     {
-      id: 'corpsec', sheet: 'CORPSEC', name: 'CORSEC', full: 'Corporate Secretary',
-      objective: ['Mengetahui tingkat pelayanan CORSEC terhadap karyawan MPM (Legal, Corcomm, Risk Management, Policy & Procedure, Document & Filing)',
-        'Mendapat masukan atau saran dari karyawan mengenai perbaikan layanan CORSEC di tahun mendatang'],
+      id: 'corpsec', sheet: 'CORPSEC', name: 'CORPSEC', full: 'Corporate Secretary',
+      objective: ['Mengetahui tingkat pelayanan CORPSEC terhadap karyawan MPM (Legal, Corcomm, Risk Management, Policy & Procedure, Document & Filing)',
+        'Mendapat masukan atau saran dari karyawan mengenai perbaikan layanan CORPSEC di tahun mendatang'],
       nHistory: { 2021: [19, 34, 12], 2022: [20, 40, 11], 2023: [16, 37, 2], 2024: [12, 43, 11], 2025: [13, 21, 6] },
       indexHistory: { 2025: [4.05, 4.03, 3.96, 3.96] },
       subHistory: {
@@ -298,10 +298,10 @@ window.SURVEY_CONFIG = {
         { h: '1. Kepuasan terhadap proses penyimpanan', label: 'Penyimpanan & pengarsipan dokumen inaktif', sub: 'Document & Filing' },
         { h: '2. Kepuasan terhadap kecepatan', label: 'Kecepatan pelayanan penyediaan dokumen inaktif', sub: 'Document & Filing', b25: [4.11, 4.00, 4.25, 4.00], note: 'Pembanding 2025: mutasi arsip & pemenuhan peminjaman dokumen' },
         { h: '3. Kejelasan panduan', label: 'Kejelasan panduan pengelolaan dokumen inaktif', sub: 'Document & Filing' },
-        { h: '1. Kepuasan terhadap pelayanan CORSEC', label: 'Kepuasan keseluruhan terhadap CORSEC', sub: 'Kepuasan keseluruhan', overall: true },
+        { h: '1. Kepuasan terhadap pelayanan CORSEC', label: 'Kepuasan keseluruhan terhadap CORPSEC', sub: 'Kepuasan keseluruhan', overall: true },
       ],
       texts: [
-        { h: 'Apa saran & kritk anda kedepannya untuk tim CORSEC', label: 'Saran & kritik untuk CORSEC' },
+        { h: 'Apa saran & kritk anda kedepannya untuk tim CORSEC', label: 'Saran & kritik untuk CORPSEC' },
         { h: '16. Apa saran', label: 'Saran untuk produk legal' },
         { h: '17. Apa saran', label: 'Saran untuk petugas legal' },
         { h: '14. Layanan legal', label: 'Layanan legal yang dianggap sulit' },

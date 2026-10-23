@@ -1,6 +1,6 @@
 # Dashboard Survey Layanan Internal 2026
 
-Website interaktif untuk analisis **Survey Pengukuran Kepuasan Layanan Divisi 2026** (IT, Helpdesk, SIMO, HCGS, CORSEC, Purchasing).
+Website interaktif untuk analisis **Survey Pengukuran Kepuasan Layanan Divisi 2026** (IT, Helpdesk, SIMO, HCGS, CORPSEC, Purchasing).
 Struktur analisis mengikuti *Report Survey Pelayanan Divisi 2025*: outline survey, index per indikator (total & per area Simpang Dukuh / Sedati / Others),
 gap vs 2025, sub-kategori, tren index per area, kritik & saran, serta prioritas perbaikan.
 
@@ -10,7 +10,7 @@ gap vs 2025, sub-kategori, tren index per area, kritik & saran, serta prioritas 
 - **Halaman per divisi** – KPI, temuan utama otomatis, outline survey (n 2021–2026), tabel index ala report 2025 (bisa diurutkan),
   tren index per area, radar sub-kategori, dumbbell 2025→2026, distribusi jawaban, heatmap area, matriks prioritas.
 - **Analisis khusus** – eNPS, preferensi event (ranking), mentoring/coaching (HCGS); kesesuaian kategori prioritas (Helpdesk);
-  tingkat interaksi per unit (CORSEC).
+  tingkat interaksi per unit (CORPSEC).
 - **Kritik & saran** – word cloud, treemap tema otomatis, penyaringan jawaban kosong, pencarian.
 - **Grafik** – ECharts: gauge, dumbbell, bump chart, streamgraph, heatmap, sunburst, radar, waffle, rose, lollipop, treemap.
 - **Filter dinamis** – area kerja, divisi responden, jabatan (berlaku untuk semua angka & grafik).
