@@ -8,10 +8,11 @@ gap vs 2025, sub-kategori, tren index per area, kritik & saran, serta prioritas 
 
 - **Ringkasan lintas divisi** – index 2024/2025/2026 + gap + kategori, index per area, progres respons harian, 5 indikator tertinggi/terendah.
 - **Halaman per divisi** – KPI, temuan utama otomatis, outline survey (n 2021–2026), tabel index ala report 2025 (bisa diurutkan),
-  tren index per area, index sub-kategori, skor & distribusi jawaban per indikator, prioritas perbaikan.
+  tren index per area, radar sub-kategori, dumbbell 2025→2026, distribusi jawaban, heatmap area, matriks prioritas.
 - **Analisis khusus** – eNPS, preferensi event (ranking), mentoring/coaching (HCGS); kesesuaian kategori prioritas (Helpdesk);
   tingkat interaksi per unit (CORSEC).
-- **Kritik & saran** – penyaringan jawaban kosong, pengelompokan tema otomatis, kata yang sering muncul, pencarian.
+- **Kritik & saran** – word cloud, treemap tema otomatis, penyaringan jawaban kosong, pencarian.
+- **Grafik** – ECharts: gauge, dumbbell, bump chart, streamgraph, heatmap, sunburst, radar, waffle, rose, lollipop, treemap.
 - **Filter dinamis** – area kerja, divisi responden, jabatan (berlaku untuk semua angka & grafik).
 - **Data live** dari Google Sheets (refresh otomatis tiap 5 menit), cadangan snapshot lokal, atau unggah file `.xlsx` manual. Tombol cetak/PDF.
 

@@ -205,7 +205,7 @@
     resp.forEach((r) => cols.forEach((col) => {
       const v = String(r.row[col] || '').trim().replace(/[:.]+$/, '');
       if (!v || norm(v) === 'none') return;
-      const key = norm(v);
+      const key = norm(v).replace(/[^a-z0-9\s&]/g, ' ').replace(/\s+/g, ' ').trim();
       if (!shown[key]) shown[key] = v[0].toUpperCase() + v.slice(1);
       c[key] = (c[key] || 0) + 1;
     }));
