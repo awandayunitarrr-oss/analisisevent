@@ -15,7 +15,7 @@
   const LIKERT = ['#dc2626', '#fb923c', '#cbd5e1', '#60a5fa', '#2563eb'];
   const CAT_COLOR = { 'cat-1': '#dc2626', 'cat-2': '#f97316', 'cat-3': '#f59e0b', 'cat-4': '#0ea5e9', 'cat-5': '#16a34a' };
   const T = {};
-  const MASCOT = '<img class="band-mascot" src="assets/img/maskot.png" alt="Maskot burung, harimau, dan gajah melambai" width="388" height="131">';
+  const MASCOT = '<img class="band-mascot" src="assets/img/maskot.png" alt="Maskot burung, harimau, dan gajah melambai" width="388" height="128">';
 
   const state = { sheets: null, source: '', loadedAt: null, prepared: {}, filters: { area: '', div: '' }, charts: [], route: 'ringkasan', ui: {} };
 
