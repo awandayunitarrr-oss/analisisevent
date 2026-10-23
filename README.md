@@ -18,20 +18,26 @@ gap vs 2025, sub-kategori, tren index per area, kritik & saran, serta prioritas 
 
 ## Mode presentasi
 
-Klik **▶ Presentasi** di header. Setiap bagian halaman tampil sebagai satu slide **16:9 berukuran 1280×720** (sama dengan PowerPoint widescreen), diskalakan pas ke layar, berurutan dari Ringkasan lalu tiap divisi. Setiap slide memuat logo, tab divisi yang bisa diklik untuk lompat ke divisi lain, judul, insight, isi, dan footer bernomor.
+Klik **▶ Presentasi** di header. Presentasi berbentuk deck laporan **16:9 berukuran 1280×720** (sama dengan PowerPoint widescreen):
+setiap slide disusun dari panel ringkas dalam grid 4 kolom (daftar berperingkat dengan bar, kartu #1–#3, radial progress,
+kutipan, kotak INSIGHT), sehingga total hanya ±17 slide:
+
+| Bagian | Slide |
+|---|---|
+| Ringkasan | 1. Index per divisi + perubahan 2025→2026 + index per area · 2. Peringkat, respons harian, indikator tertinggi & terendah |
+| Setiap divisi | 1. Index, tren per area & skor semua indikator · 2. Komposisi jawaban, prioritas perbaikan, tema kritik & saran, kutipan karyawan |
+| Divisi dengan pertanyaan khusus (Helpdesk, HCGS, CORPSEC) | 3. Analisis khusus (eNPS, preferensi event, interaksi unit, dll.) & profil responden |
+
+Judul, subjudul, dan insight dihitung dari data terkini dan mengikuti filter. Bar bawah: ◀ nomor slide ▶, pilihan slide,
+jumlah responden, **Filter** (area & divisi responden), **Layar penuh**, **Keluar**. Tab divisi di setiap slide bisa diklik untuk lompat.
 
 | Tombol | Fungsi |
 |---|---|
-| → / Spasi / PageDown | slide berikutnya (lanjut ke divisi berikutnya setelah slide terakhir) |
-| ← / PageUp | slide sebelumnya |
+| → / Spasi | slide berikutnya |
+| ← | slide sebelumnya |
 | ↓ / ↑ | lompat ke divisi berikutnya / sebelumnya |
-| Home / End | slide pertama / terakhir divisi ini |
 | F | layar penuh |
 | Esc | keluar |
-
-Setiap slide punya judul dan **insight otomatis** di bagian atas yang dihitung dari data terkini.
-Filter area & divisi bisa diubah langsung dari bar presentasi; semua angka, grafik, dan insight ikut berubah.
-Di ponsel/tablet: geser kiri/kanan.
 
 ## Sumber data
 

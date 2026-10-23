@@ -76,16 +76,6 @@
   const fade = (hex, alpha) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${alpha})`; };
   const catLabel = (v) => (A.category(v) || {}).label || '';
 
-  /* ───────── meta slide (judul + insight untuk mode presentasi) ───────── */
-  function setSlides(map) {
-    Object.entries(map).forEach(([key, v]) => {
-      const el = document.querySelector(`[data-s="${key}"]`);
-      if (el && v) { el.dataset.title = v[0]; el.dataset.insight = v[1] || ''; }
-    });
-  }
-  function setCardInsight(id, html) { const el = document.getElementById(id); if (el) el.dataset.insight = html; }
-  const share = (n, t) => (t ? Math.round((n / t) * 100) + '%' : '–');
-
   /* ───────── data & filter ───────── */
   // Filter silang: klik area/divisi di grafik untuk memfilter, klik lagi untuk menghapus.
   function setFilter(key, val) {
@@ -202,7 +192,7 @@
     }
 
     $('#app').innerHTML = `
-      <section data-s="ov-band" class="band">
+      <section class="band">
         <div class="band-head">
           <div class="band-text">
             <p class="eyebrow">Survey Pengukuran Kepuasan Divisi · Karyawan MPM ${CFG.year}</p>
@@ -219,7 +209,7 @@
         </div>
       </section>
 
-      <section data-s="ov-cards" class="div-cards">
+      <section class="div-cards">
         ${rows.map((r) => `
           <a class="div-card" href="#${r.d.id}" style="--dc:${r.color};--dc2:${DIV_GRAD[r.d.id]}">
             <div class="div-card-head"><div><b>${esc(r.d.name)}</b><span>${esc(r.d.full)}</span></div>${gapHtml(r.an.index[0], r.prev[0])}</div>
@@ -234,26 +224,26 @@
           </a>`).join('')}
       </section>
 
-      <section data-s="ov-insight" class="card insight"><h2>Temuan utama</h2><ul>${insights.map((i) => `<li>${i}</li>`).join('')}</ul></section>
+      <section class="card insight"><h2>Temuan utama</h2><ul>${insights.map((i) => `<li>${i}</li>`).join('')}</ul></section>
 
-      <section data-s="ov-change" class="grid-2">
+      <section class="grid-2">
         <div class="card"><h2>Perubahan index ${CFG.prevYear} → ${CFG.year}</h2><p class="muted">Dumbbell chart: titik abu-abu ${CFG.prevYear}, titik merah ${CFG.year}; garis hijau = naik, kuning = turun.</p><div class="chart h-320" id="cDumb"></div></div>
         <div class="card"><h2>Peringkat divisi dari tahun ke tahun</h2><p class="muted">Bump chart: posisi 1 = index tertinggi pada tahun tersebut.</p><div class="chart h-320" id="cBump"></div></div>
       </section>
 
-      <section data-s="ov-area" class="grid-2">
+      <section class="grid-2">
         <div class="card"><h2>Peta panas index per area</h2><p class="muted">Warna mengikuti kategori kepuasan ${CFG.year}.</p><div class="chart h-320" id="cHeat"></div></div>
         <div class="card"><h2>Komposisi responden</h2><p class="muted">Sunburst: lingkar dalam = survey divisi, lingkar luar = area kerja.</p><div class="chart h-320" id="cSun"></div></div>
       </section>
 
-      <section data-s="ov-river" class="card"><h2>Arus respons harian</h2><p class="muted">Streamgraph jumlah respons per hari untuk tiap survey.</p><div class="chart h-280" id="cRiver"></div></section>
+      <section class="card"><h2>Arus respons harian</h2><p class="muted">Streamgraph jumlah respons per hari untuk tiap survey.</p><div class="chart h-280" id="cRiver"></div></section>
 
-      <section data-s="ov-rank" class="grid-2">
+      <section class="grid-2">
         <div class="card"><h2>Indikator tertinggi</h2><div class="chart h-300" id="cBest"></div></div>
         <div class="card"><h2>Indikator terendah</h2><div class="chart h-300" id="cWorst"></div></div>
       </section>
 
-      <section data-s="ov-table" class="card">
+      <section class="card">
         <div class="card-head"><h2>Tabel index per divisi</h2><p class="muted">Klik baris untuk membuka detail divisi.</p></div>
         <div class="table-wrap">
           <table class="idx-table overview-table">
@@ -323,23 +313,6 @@
     });
 
     if (sun) sun.on('click', (p) => { if (AREAS.includes(p.name)) setFilter('area', p.name); });
-
-    const gaps = withIdx.filter((r) => r.prev[0] != null).map((r) => ({ r, g: A.round2(r.an.index[0]) - r.prev[0] })).sort((a, b) => b.g - a.g);
-    const areaTot = AREAS.map((a, i) => [a, rows.reduce((t, r) => t + r.an.areaN[i], 0)]).sort((a, b) => b[1] - a[1]);
-    let lowCell = null;
-    rows.forEach((r) => AREAS.forEach((a, i) => { const v = r.an.index[i + 1]; if (v != null && (!lowCell || v < lowCell.v)) lowCell = { v, a, d: r.d.name }; }));
-    const peak = perDay.length ? perDay.indexOf(Math.max(...perDay)) : -1;
-    const sgn = (g) => (g >= 0 ? '+' : '') + g.toFixed(2);
-    setSlides({
-      'ov-band': [`Ringkasan Index Pelayanan Divisi ${CFG.year}`, withIdx.length ? `Rata-rata index <b>${f2(avgIdx)}</b> (${catLabel(avgIdx).toLowerCase()}) dari <b>${totalN}</b> respons di ${rows.length} survey divisi.` : ''],
-      'ov-cards': ['Index per divisi', ranked.length ? `<b>${esc(ranked[0].d.name)}</b> tertinggi (${f2(ranked[0].an.index[0])}), <b>${esc(ranked[ranked.length - 1].d.name)}</b> terendah (${f2(ranked[ranked.length - 1].an.index[0])}). ${up} divisi naik, ${down} turun dibanding ${CFG.prevYear}.` : ''],
-      'ov-insight': ['Temuan utama', insights[3] || insights[0] || ''],
-      'ov-change': [`Perubahan & peringkat ${CFG.prevYear} → ${CFG.year}`, gaps.length ? `Kenaikan terbesar <b>${esc(gaps[0].r.d.name)}</b> (${sgn(gaps[0].g)}); penurunan terbesar <b>${esc(gaps[gaps.length - 1].r.d.name)}</b> (${sgn(gaps[gaps.length - 1].g)}).` : ''],
-      'ov-area': ['Index per area & komposisi responden', `Responden terbanyak dari <b>${areaTot[0][0]}</b> (${areaTot[0][1]} respons).${lowCell ? ` Skor area terendah: <b>${esc(lowCell.d)}</b> di ${lowCell.a} (${f2(lowCell.v)}).` : ''} Klik area untuk memfilter.`],
-      'ov-river': ['Arus respons harian', peak >= 0 ? `Puncak respons <b>${perDay[peak]}</b> pada ${fmtDate(new Date(days[peak]))}; pengisian berlangsung ${days.length} hari.` : ''],
-      'ov-rank': ['Indikator tertinggi & terendah', best[0] ? `Tertinggi: <b>${esc(best[0].label)}</b> (${esc(best[0].divName)}, ${f2(best[0].stats.mean)}). Terendah: <b>${esc(worst[0].label)}</b> (${esc(worst[0].divName)}, ${f2(worst[0].stats.mean)}).` : ''],
-      'ov-table': ['Tabel index per divisi', `${withIdx.filter((r) => r.an.index[0] > 4.2).length} dari ${withIdx.length} divisi berkategori <b>sangat puas</b> (> 4.2).`],
-    });
 
     lollipop('cBest', best.map((i) => `${i.label} · ${i.divName}`), best.map((i) => A.round2(i.stats.mean)), best.map((i) => DIV_COLOR[i.divId]));
     lollipop('cWorst', worst.map((i) => `${i.label} · ${i.divName}`), worst.map((i) => A.round2(i.stats.mean)), worst.map((i) => DIV_COLOR[i.divId]));
@@ -502,7 +475,7 @@
     state.ui.itemView = state.ui.itemView || 'dumbbell';
 
     $('#app').innerHTML = `
-      <section data-s="dv-band" class="band">
+      <section class="band">
         <div class="band-head">
           <div class="band-text">
             <p class="eyebrow">Survey Pengukuran Kepuasan · ${esc(d.full)}</p>
@@ -520,14 +493,14 @@
       </section>
       ${missingCols.length ? `<div class="alert">Kolom tidak ditemukan di sheet: ${missingCols.map(esc).join('; ')}. Periksa judul kolom pada spreadsheet.</div>` : ''}
 
-      <section data-s="dv-insight" class="card insight"><h2>Temuan utama</h2><ul>${divisionInsights(d, an, prev).map((i) => `<li>${i}</li>`).join('')}</ul></section>
+      <section class="card insight"><h2>Temuan utama</h2><ul>${divisionInsights(d, an, prev).map((i) => `<li>${i}</li>`).join('')}</ul></section>
 
-      <section data-s="dv-trend" class="grid-2">
+      <section class="grid-2">
         <div class="card"><h2>Tren index per area</h2><p class="muted">${Object.keys(d.indexHistory).length ? 'Index total dan per area kerja, ' + Object.keys(d.indexHistory)[0] + '–' + CFG.year + '.' : 'Pembanding tahun lalu belum tersedia.'}</p><div class="chart h-300" id="cTrend"></div>${d.indexHistoryNote ? `<p class="note">${esc(d.indexHistoryNote)}</p>` : ''}</div>
         <div class="card"><h2>${an.subs.filter((s) => !s.overall && s.value).length + an.groups.length >= 3 ? 'Radar sub-kategori' : 'Radar indikator'}</h2><p class="muted">Garis putus abu-abu = ${CFG.prevYear}, area berwarna = ${CFG.year}.</p><div class="chart h-300" id="cRadar"></div></div>
       </section>
 
-      <section data-s="dv-items" class="card">
+      <section class="card">
         <div class="card-head row">
           <div><h2>Skor per indikator</h2><p class="muted" id="itemHint"></p></div>
           <div class="seg" role="tablist">
@@ -539,16 +512,16 @@
         <div class="chart" id="cItems" style="height:${Math.max(280, scored.length * 40 + 90)}px"></div>
       </section>
 
-      <section data-s="dv-prio" class="grid-2">
+      <section class="grid-2">
         <div class="card"><h2>Matriks prioritas</h2><p class="muted">Sumbu X = skor ${CFG.year}, sumbu Y = % responden belum puas (netral/tidak puas). Kuadran kanan-atas = prioritas perbaikan.</p><div class="chart h-360" id="cQuad"></div></div>
         <div class="card"><h2>Prioritas perbaikan</h2><p class="muted">Bahan <i>problem identification</i> &amp; <i>corrective action</i>.</p>${priorityHtml(an)}</div>
       </section>
 
       ${extrasHtml(prep)}
 
-      <section data-s="dv-comments" class="card" id="comments"></section>
+      <section class="card" id="comments"></section>
 
-      <section data-s="dv-table" class="card">
+      <section class="card">
         <div class="card-head row">
           <div><h2>Tabel index ${esc(d.name)}</h2><p class="muted">Format seperti report ${CFG.prevYear}: total dan per area kerja. Gap = ${CFG.year} − ${CFG.prevYear}.</p></div>
           <label class="inline" for="sortSel">Urutkan
@@ -561,14 +534,13 @@
           </label>
         </div>
         <div class="table-wrap" id="idxTable"></div>
-        <div class="pres-only pres-table" id="idxTablePres"></div>
         <details class="outline" ${state.ui.outlineOpen ? 'open' : ''}>
           <summary><h3>Outline survey &amp; jumlah responden 2021–${CFG.year}</h3></summary>
           ${outlineHtml(d, an)}
         </details>
       </section>
 
-      <section data-s="dv-profile" class="card">
+      <section class="card">
         <h2>Profil responden</h2>
         <div class="grid-3">
           <div><h3>Area kerja</h3><div class="chart h-240" id="cProfArea"></div></div>
@@ -584,7 +556,6 @@
     const drawTable = () => { $('#idxTable').innerHTML = indexTableHtml(d, an, sortSel.value); };
     sortSel.addEventListener('change', () => { state.ui.sort = sortSel.value; drawTable(); });
     drawTable();
-    $('#idxTablePres').innerHTML = presTableHtml(d, an);
 
     miniGauge('kGauge', an.index[0], '#ffffff', 'rgba(255,255,255,.55)', { fontSize: 24, width: 12, textColor: '#ffffff', track: 'rgba(255,255,255,.22)' });
     ec('kArea', {
@@ -619,38 +590,8 @@
     setView(state.ui.itemView);
     drawQuadrant(an);
     drawExtras(prep, resp, color);
-    divisionSlides(d, an, prev, prep, resp);
     renderComments(prep, resp, color);
     drawProfile(d, resp, color);
-  }
-
-  function divisionSlides(d, an, prev, prep, resp) {
-    const items = an.items.filter((i) => !i.overall && i.stats.n > 0);
-    const byMean = items.slice().sort((a, b) => b.stats.mean - a.stats.mean);
-    const idx = an.index[0];
-    const g = prev[0] != null && idx != null ? A.round2(idx) - prev[0] : null;
-    const areas = AREAS.map((a, i) => ({ a, v: an.index[i + 1] })).filter((x) => x.v != null).sort((a, b) => a.v - b.v);
-    const subs = an.subs.filter((s) => !s.overall && s.value && s.value[0] != null).sort((a, b) => a.value[0] - b.value[0]);
-    const prio = priorityTop(an)[0];
-    const mx = A.mean(items.map((i) => i.stats.mean)), my = A.mean(items.map((i) => 1 - i.stats.top2));
-    const nQuad = items.filter((i) => i.stats.mean < mx && 1 - i.stats.top2 > my).length;
-    const entries = A.textEntries(prep, resp);
-    const themes = Object.keys(d.themes || {}).map((t) => [t, entries.filter((e) => e.themes.includes(t)).length]).sort((a, b) => b[1] - a[1]);
-    const words = A.wordFreq(entries, 3).map((w) => `“${esc(w[0])}”`);
-    const cnt = (fn) => { const c = {}; resp.forEach((r) => { const k = fn(r); c[k] = (c[k] || 0) + 1; }); return Object.entries(c).sort((a, b) => b[1] - a[1]); };
-    const topArea = cnt((r) => r.area)[0], topJab = cnt((r) => r.jab)[0];
-    const drops = items.filter((i) => i.b25 && i.b25[0] != null && i.stats.mean < i.b25[0] - 0.005).length;
-    setSlides({
-      'dv-band': [`Index Pelayanan ${d.name} ${CFG.year}`, idx != null ? `Index <b>${f2(idx)}</b> (${catLabel(idx).toLowerCase()})${g != null ? `, ${g > 0.004 ? 'naik' : g < -0.004 ? 'turun' : 'tetap'} ${Math.abs(g).toFixed(2)} dari ${f2(prev[0])} di ${CFG.prevYear}` : ''} · ${an.n} responden.` : 'Belum ada jawaban untuk filter ini.'],
-      'dv-insight': ['Temuan utama', divisionInsights(d, an, prev)[1] || ''],
-      'dv-trend': ['Tren index & sub-kategori', [areas.length > 1 ? `Area terendah <b>${areas[0].a}</b> (${f2(areas[0].v)}), tertinggi <b>${areas[areas.length - 1].a}</b> (${f2(areas[areas.length - 1].v)}).` : '', subs.length > 1 ? `Sub-kategori terendah <b>${esc(subs[0].name)}</b> (${f2(subs[0].value[0])}).` : ''].join(' ')],
-      'dv-items': ['Skor per indikator', byMean.length ? `Tertinggi <b>${esc(byMean[0].label)}</b> (${f2(byMean[0].stats.mean)}); terendah <b>${esc(byMean[byMean.length - 1].label)}</b> (${f2(byMean[byMean.length - 1].stats.mean)}).${drops ? ` ${drops} indikator turun dibanding ${CFG.prevYear}.` : ''}` : ''],
-      'dv-prio': ['Prioritas perbaikan', prio ? `Prioritas #1: <b>${esc(prio.label)}</b> (${f2(prio.stats.mean)}). ${nQuad} indikator berada di kuadran prioritas utama.` : ''],
-      'dv-extras': ['Analisis tambahan', ''],
-      'dv-comments': ['Kritik & saran karyawan', entries.length ? `${entries.length} masukan bermakna${themes[0] && themes[0][1] ? `; tema terbanyak <b>${esc(themes[0][0])}</b> (${themes[0][1]})` : ''}${words.length ? `; kata yang sering muncul ${words.join(', ')}` : ''}.` : 'Belum ada masukan tertulis.'],
-      'dv-table': [`Tabel index ${d.name}`, `${items.filter((i) => i.stats.mean > 4.2).length} dari ${items.length} indikator berkategori <b>sangat puas</b> (> 4.2)${drops ? `; ${drops} indikator turun vs ${CFG.prevYear}` : ''}.`],
-      'dv-profile': ['Profil responden', topArea ? `Mayoritas responden dari <b>${topArea[0]}</b> (${share(topArea[1], resp.length)}); jabatan terbanyak <b>${esc(topJab[0])}</b> (${share(topJab[1], resp.length)}). Klik area atau divisi untuk memfilter.` : ''],
-    });
   }
 
   function divisionInsights(d, an, prev) {
@@ -744,26 +685,6 @@
       an.items.filter((i) => !i.overall).sort(key).forEach((it) => { body += row(it); });
     }
     return `<table class="idx-table">${head}<tbody>${totalRow}${body}</tbody></table>`;
-  }
-
-  // Tabel ringkas khusus presentasi: Total 2025/2026/Gap + % puas, dibagi dua kolom agar muat satu slide.
-  function presTableHtml(d, an) {
-    const prevIdx = d.indexHistory[CFG.prevYear] || [];
-    const rows = [`<tr class="row-index"><td class="left">INDEX ${esc(d.name.toUpperCase())}</td><td class="num prev">${f2(prevIdx[0])}</td>${scoreCell(an.index[0])}<td class="num">${gapHtml(an.index[0], prevIdx[0])}</td><td class="num">${an.n}</td></tr>`];
-    an.subs.forEach((sb) => {
-      if (an.subs.length > 1) {
-        const p = (sb.hist[CFG.prevYear] || [])[0];
-        rows.push(`<tr class="row-sub"><td class="left">${esc(sb.name)}</td><td class="num prev">${f2(p)}</td>${scoreCell(sb.value ? sb.value[0] : null)}<td class="num">${gapHtml(sb.value ? sb.value[0] : null, p)}</td><td></td></tr>`);
-      }
-      sb.items.slice().sort((a, b) => (b.stats.mean ?? -1) - (a.stats.mean ?? -1)).forEach((it) => {
-        const b = (it.b25 || [])[0];
-        rows.push(`<tr><td class="left">${esc(it.label)}</td><td class="num prev">${f2(b)}</td>${scoreCell(it.stats.mean)}<td class="num">${gapHtml(it.stats.mean, b)}</td><td class="num">${pct(it.stats.top2)}</td></tr>`);
-      });
-    });
-    const head = `<thead><tr><th class="left">Indikator</th><th>${CFG.prevYear}</th><th>${CFG.year}</th><th>Gap</th><th>% Puas</th></tr></thead>`;
-    const half = rows.length > 14 ? Math.ceil(rows.length / 2) : rows.length;
-    return [rows.slice(0, half), rows.slice(half)].filter((r) => r.length)
-      .map((r) => `<div class="table-wrap"><table class="idx-table">${head}<tbody>${r.join('')}</tbody></table></div>`).join('');
   }
 
   function drawTrend(d, an, color) {
@@ -904,16 +825,16 @@
   /* ───────── ekstra per divisi ───────── */
   function extrasHtml(prep) {
     const parts = [];
-    if (prep.gates.length) parts.push(`<div class="card" id="xcG"><h2>Interaksi dengan layanan</h2><p class="muted">Persentase responden yang pernah berinteraksi dengan tiap unit.</p><div class="chart h-280" id="cGates"></div></div>`);
+    if (prep.gates.length) parts.push(`<div class="card"><h2>Interaksi dengan layanan</h2><p class="muted">Persentase responden yang pernah berinteraksi dengan tiap unit.</p><div class="chart h-280" id="cGates"></div></div>`);
     prep.extras.forEach((x, k) => {
       if (!x.cols.length) return;
-      if (x.type === 'nps') parts.push(`<div class="card span-2" id="xc${k}"><h2>${esc(x.label)}</h2><div class="nps-wrap"><div class="chart h-240" id="cXg${k}"></div><div class="chart h-240" id="cX${k}"></div></div><div id="xNps${k}"></div></div>`);
-      else if (x.type === 'yesno') parts.push(`<div class="card" id="xc${k}"><h2>${esc(x.label)}</h2><div class="waffle-wrap" id="xW${k}"></div></div>`);
-      else if (x.type === 'rank') parts.push(`<div class="card" id="xc${k}"><h2>${esc(x.label)}</h2><div class="chart h-300" id="cX${k}"></div></div>`);
-      else if (x.type === 'likert') parts.push(`<div class="card" id="xc${k}"><h2>${esc(x.label)}</h2><div class="chart h-260" id="cX${k}"></div></div>`);
-      else parts.push(`<div class="card" id="xc${k}"><h2>${esc(x.label)}</h2><div class="chart h-300" id="cX${k}"></div></div>`);
+      if (x.type === 'nps') parts.push(`<div class="card span-2"><h2>${esc(x.label)}</h2><div class="nps-wrap"><div class="chart h-240" id="cXg${k}"></div><div class="chart h-240" id="cX${k}"></div></div><div id="xNps${k}"></div></div>`);
+      else if (x.type === 'yesno') parts.push(`<div class="card"><h2>${esc(x.label)}</h2><div class="waffle-wrap" id="xW${k}"></div></div>`);
+      else if (x.type === 'rank') parts.push(`<div class="card"><h2>${esc(x.label)}</h2><div class="chart h-300" id="cX${k}"></div></div>`);
+      else if (x.type === 'likert') parts.push(`<div class="card"><h2>${esc(x.label)}</h2><div class="chart h-260" id="cX${k}"></div></div>`);
+      else parts.push(`<div class="card"><h2>${esc(x.label)}</h2><div class="chart h-300" id="cX${k}"></div></div>`);
     });
-    return parts.length ? `<section data-s="dv-extras" class="grid-2 extras">${parts.join('')}</section>` : '';
+    return parts.length ? `<section class="grid-2 extras">${parts.join('')}</section>` : '';
   }
 
   function waffle(pctYes, prevYes, yes, n) {
@@ -932,8 +853,6 @@
         const ans = resp.map((r) => A.norm(r.row[g.col])).filter((v) => v && v !== 'none');
         return { label: g.label, yes: ans.filter((v) => v === 'pernah').length, n: ans.length };
       });
-      const topGate = vals.slice().sort((a, b) => b.yes / (b.n || 1) - a.yes / (a.n || 1));
-      setCardInsight('xcG', topGate.length ? `Interaksi tertinggi dengan <b>${esc(topGate[0].label)}</b> (${share(topGate[0].yes, topGate[0].n)}), terendah <b>${esc(topGate[topGate.length - 1].label)}</b> (${share(topGate[topGate.length - 1].yes, topGate[topGate.length - 1].n)}).` : '');
       ec('cGates', {
         polar: { radius: ['18%', '86%'] },
         angleAxis: { max: 100, startAngle: 90, show: false },
@@ -951,13 +870,11 @@
       if (x.type === 'yesno') {
         const ans = resp.map((r) => A.norm(r.row[x.cols[0]])).filter((v) => v === 'ya' || v === 'tidak');
         const ya = ans.filter((v) => v === 'ya').length;
-        setCardInsight('xc' + k, `<b>${share(ya, ans.length)}</b> responden menjawab Ya${x.prev ? ` (${CFG.prevYear}: ${pct(x.prev.Ya)})` : ''}.`);
         const box = $('#xW' + k);
         box.style.setProperty('--wc', color);
         box.innerHTML = waffle(ans.length ? ya / ans.length : null, x.prev ? x.prev.Ya : null, ya, ans.length);
       } else if (x.type === 'likert') {
         const scores = resp.map((r) => A.score(r.row[x.cols[0]])).filter((v) => v != null);
-        setCardInsight('xc' + k, scores.length ? `Skor rata-rata <b>${f2(A.mean(scores))}</b>; ${share(scores.filter((v) => v >= 4).length, scores.length)} menilai penting/sangat penting.` : '');
         const names = ['Sangat tidak penting', 'Tidak penting', 'Antara', 'Penting', 'Sangat penting'];
         const entries = names.map((nm, i) => [nm, scores.filter((v) => v === i + 1).length]).filter((e) => e[1] > 0).reverse();
         donut('cX' + k, entries, { colors: entries.map((e) => LIKERT[names.indexOf(e[0])]), centerText: f2(A.mean(scores)), centerSub: 'skor rata-rata' });
@@ -965,7 +882,6 @@
         const vals = resp.map((r) => String(r.row[x.cols[0]]).trim()).filter((v) => v !== '' && !Number.isNaN(Number(v.replace(',', '.')))).map((v) => Number(v.replace(',', '.'))).filter((v) => v >= 0 && v <= 10);
         const pro = vals.filter((v) => v >= 9).length, det = vals.filter((v) => v <= 6).length, pas = vals.length - pro - det;
         const nps = vals.length ? Math.round(((pro - det) / vals.length) * 100) : null;
-        setCardInsight('xc' + k, nps == null ? '' : `eNPS <b>${nps > 0 ? '+' : ''}${nps}</b>: ${share(pro, vals.length)} promoter, ${share(det, vals.length)} detractor.`);
         ec('cXg' + k, {
           series: [{
             type: 'gauge', min: -100, max: 100, startAngle: 200, endAngle: -20, radius: '100%', center: ['50%', '62%'], splitNumber: 4,
@@ -997,7 +913,6 @@
         const c = all.slice(0, 7);
         const rest = all.slice(7).reduce((sum, v) => sum + v[1], 0);
         if (rest) c.push([`Jawaban lain (${all.length - 7} variasi)`, rest]);
-        setCardInsight('xc' + k, c[0] ? `Paling banyak disebut: <b>${esc(c[0][0])}</b> (${c[0][1]} responden).` : '');
         lollipop('cX' + k, c.map((v) => v[0]), c.map((v) => v[1]), PALETTE, { min: 0, fmt: (v) => `${v} org`, labelWidth: 170 });
       } else if (x.type === 'rank') {
         const pts = {};
@@ -1008,7 +923,6 @@
           pts[key] = (pts[key] || 0) + (x.cols.length - rank);
         }));
         const list = Object.entries(pts).sort((a, b) => b[1] - a[1]);
-        setCardInsight('xc' + k, list[0] ? `Preferensi utama: <b>${esc(list[0][0])}</b>${list[1] ? `, disusul ${esc(list[1][0])}` : ''}.` : '');
         ec('cX' + k, {
           color: PALETTE,
           tooltip: { formatter: (p) => `${esc(p.name)}<br><b>${p.value}</b> poin preferensi` },
@@ -1121,6 +1035,9 @@
   }
 
   /* ───────── init ───────── */
+  // Dipakai mode presentasi (present.js) untuk menyusun slide dari data & filter yang sama.
+  window.SurveyApp = { analyzeAll, priorityTop };
+
   function init() {
     buildTabs();
     window.addEventListener('hashchange', onRoute);
