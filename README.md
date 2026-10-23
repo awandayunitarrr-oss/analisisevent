@@ -14,7 +14,7 @@ gap vs 2025, sub-kategori, tren index per area, kritik & saran, serta prioritas 
 - **Kritik & saran** – word cloud, treemap tema otomatis, penyaringan jawaban kosong, pencarian.
 - **Grafik** – ECharts: gauge, dumbbell, bump chart, streamgraph, heatmap, sunburst, radar, waffle, rose, lollipop, treemap.
 - **Filter dinamis** – area kerja, divisi responden, jabatan (berlaku untuk semua angka & grafik).
-- **Data live** dari Google Sheets (refresh otomatis tiap 5 menit), cadangan snapshot lokal, atau unggah file `.xlsx` manual. Tombol cetak/PDF.
+- **Data live** dari Google Sheets (refresh otomatis tiap 5 menit), dengan cadangan snapshot lokal. Tombol cetak/PDF.
 
 ## Sumber data
 

@@ -1,4 +1,4 @@
-/* Pemuatan data: Google Sheets (live) → snapshot lokal, plus unggah file manual. */
+/* Pemuatan data: Google Sheets (live) → snapshot lokal. */
 (function () {
   const CFG = window.SURVEY_CONFIG;
   const TIMEOUT_MS = 15000;
@@ -67,16 +67,5 @@
     return { sheets: s.sheets, source: 'Snapshot lokal', stamp: s.generatedAt };
   }
 
-  async function loadFile(file) {
-    const buf = await file.arrayBuffer();
-    if (/\.csv$/i.test(file.name)) {
-      const rows = cleanRows(Papa.parse(new TextDecoder().decode(buf), { skipEmptyLines: true }).data);
-      const guess = CFG.DIVISIONS.find((d) => file.name.toLowerCase().includes(d.sheet.toLowerCase()));
-      if (!guess) throw new Error('Nama file CSV harus memuat nama sheet (mis. "IT.csv", "HCGS.csv")');
-      return { sheets: { [guess.sheet]: rows }, source: 'File unggahan: ' + file.name, partial: true };
-    }
-    return { sheets: workbookToSheets(XLSX.read(buf, { type: 'array' })), source: 'File unggahan: ' + file.name };
-  }
-
-  window.SurveyData = { loadLive, loadSnapshot, loadFile };
+  window.SurveyData = { loadLive, loadSnapshot };
 })();

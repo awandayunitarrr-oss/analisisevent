@@ -103,19 +103,18 @@
   }
 
   /* ───────── load ───────── */
-  async function load(mode, file) {
+  async function load() {
     const status = $('#sourceStatus');
     status.className = 'pill pill-muted';
     status.textContent = 'Memuat data…';
     let res;
     try {
-      res = mode === 'file' ? await D.loadFile(file) : await D.loadLive();
+      res = await D.loadLive();
     } catch (e) {
       console.warn('Gagal memuat data live:', e.message);
       try { res = D.loadSnapshot(); res.warn = e.message; } catch (e2) { $('#app').innerHTML = `<div class="empty">Data tidak dapat dimuat: ${esc(e2.message)}</div>`; return; }
     }
     const first = !state.sheets;
-    if (res.partial && state.sheets) res.sheets = Object.assign({}, state.sheets, res.sheets);
     state.sheets = res.sheets;
     state.source = res.source;
     state.loadedAt = new Date();
@@ -1025,15 +1024,14 @@
       ['fArea', 'fDiv', 'fJab'].forEach((id) => { $('#' + id).value = ''; });
       render(false);
     });
-    $('#btnRefresh').addEventListener('click', () => load('live'));
-    $('#fileInput').addEventListener('change', (e) => { if (e.target.files[0]) load('file', e.target.files[0]); e.target.value = ''; });
+    $('#btnRefresh').addEventListener('click', () => load());
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     if (mq.addEventListener) mq.addEventListener('change', () => { if (state.sheets) render(false); });
     new MutationObserver(() => { if (state.sheets) render(false); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     onRoute();
-    load('live');
+    load();
     const mins = CFG.SOURCE.autoRefreshMinutes;
-    if (mins > 0) setInterval(() => { if (/live|publish/.test(state.source) && !document.hidden) load('live'); }, mins * 60000);
+    if (mins > 0) setInterval(() => { if (/live|publish/.test(state.source) && !document.hidden) load(); }, mins * 60000);
   }
 
   if (!window.echarts) document.getElementById('app').innerHTML = '<div class="empty">Library grafik gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.</div>';
