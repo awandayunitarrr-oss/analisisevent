@@ -13,7 +13,7 @@ gap vs 2025, sub-kategori, tren index per area, kritik & saran, serta prioritas 
   tingkat interaksi per unit (CORPSEC).
 - **Kritik & saran** – word cloud, treemap tema otomatis, penyaringan jawaban kosong, pencarian.
 - **Grafik** – ECharts: gauge, dumbbell, bump chart, streamgraph, heatmap, sunburst, radar, waffle, rose, lollipop, treemap.
-- **Filter dinamis** – area kerja dan divisi responden (berlaku untuk semua angka & grafik).
+- **Filter dinamis & interaktif** – area kerja dan divisi responden; klik area/divisi pada heatmap, sunburst, atau grafik profil untuk memfilter, chip filter aktif bisa dihapus dengan sekali klik (berlaku untuk semua angka & grafik).
 - **Data live** dari Google Sheets (refresh otomatis tiap 5 menit), dengan cadangan snapshot lokal. Tombol cetak/PDF.
 
 ## Mode presentasi
@@ -29,7 +29,9 @@ Klik **▶ Presentasi** di header. Setiap bagian halaman tampil sebagai satu sli
 | F | layar penuh |
 | Esc | keluar |
 
-Di ponsel/tablet: geser kiri/kanan. Filter area & divisi yang aktif tetap berlaku selama presentasi.
+Setiap slide punya judul dan **insight otomatis** di bagian atas yang dihitung dari data terkini.
+Filter area & divisi bisa diubah langsung dari bar presentasi; semua angka, grafik, dan insight ikut berubah.
+Di ponsel/tablet: geser kiri/kanan.
 
 ## Sumber data
 

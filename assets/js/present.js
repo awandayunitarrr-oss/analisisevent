@@ -37,7 +37,10 @@
   function fit(el) {
     el.style.transform = '';
     const bar = document.querySelector('.present-bar');
-    const availH = window.innerHeight - (bar ? bar.offsetHeight : 0) - 64;
+    const head = document.getElementById('slideHead');
+    const headH = head ? head.offsetHeight : 0;
+    app.style.paddingTop = headH + 16 + 'px';
+    const availH = window.innerHeight - headH - (bar ? bar.offsetHeight : 0) - 56;
     const availW = window.innerWidth - 48;
     const h = Math.max(1, el.scrollHeight), w = Math.max(1, el.offsetWidth);
     const s = Math.min(availH / h, availW / w, 1.6);
@@ -57,8 +60,42 @@
     window.scrollTo({ top: 0 });
     // Grafik menyesuaikan ukuran setelah bagian ditampilkan, baru kemudian diskalakan agar muat satu layar.
     window.dispatchEvent(new Event('resize'));
+    updateHead(s);
     setTimeout(() => fit(s.el), 180);
     updateBar();
+  }
+
+  // Judul & insight slide diambil dari data-title / data-insight yang diisi dashboard dari data terkini.
+  function updateHead(s) {
+    const r = currentRoute();
+    let title = s.el.dataset.title || '';
+    let insight = s.el.dataset.insight || '';
+    if (s.kids) {
+      title = s.kids.map((k) => (k.querySelector('h2') || {}).textContent || '').filter(Boolean).join(' · ') || title;
+      insight = s.kids.map((k) => k.dataset.insight || '').filter(Boolean).join(' ');
+    }
+    document.getElementById('sEyebrow').textContent = `${NAMES[r] || ''} · Survey Kepuasan Layanan ${CFG.year}`;
+    document.getElementById('sTitle').textContent = title;
+    const ins = document.getElementById('sInsight');
+    ins.innerHTML = insight ? '<span class="bulb" aria-hidden="true">💡</span>' + insight : '';
+    ins.hidden = !insight;
+    const fa = document.getElementById('fArea').value, fd = document.getElementById('fDiv').value;
+    document.getElementById('sFilters').innerHTML = [fa && `Area: <b>${fa}</b>`, fd && `Divisi: <b>${fd}</b>`].filter(Boolean)
+      .map((t, i) => `<button type="button" class="fchip" data-pclear="${i === 0 && fa ? 'fArea' : 'fDiv'}">${t} ✕</button>`).join('');
+  }
+
+  // Filter di bar presentasi meneruskan pilihan ke filter utama dashboard.
+  function syncFilters() {
+    [['pArea', 'fArea'], ['pDiv', 'fDiv']].forEach(([p, f]) => {
+      const ps = document.getElementById(p), fs = document.getElementById(f);
+      ps.innerHTML = fs.innerHTML;
+      ps.value = fs.value;
+    });
+  }
+  function applyFilter(mainId, value) {
+    const fs = document.getElementById(mainId);
+    fs.value = value;
+    fs.dispatchEvent(new Event('change'));
   }
 
   function updateBar() {
@@ -93,6 +130,7 @@
     st.idx = 0;
     st.route = currentRoute();
     document.body.classList.add('presenting');
+    syncFilters();
     const el = document.documentElement;
     if (el.requestFullscreen && !document.fullscreenElement) el.requestFullscreen().catch(() => {});
     show();
@@ -102,6 +140,7 @@
     st.on = false;
     document.body.classList.remove('presenting');
     clearHidden();
+    app.style.paddingTop = '';
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
     window.dispatchEvent(new Event('resize'));
   }
@@ -117,6 +156,7 @@
     const r = currentRoute();
     if (r !== st.route) { st.idx = st.toEnd ? 1e9 : 0; st.route = r; }
     st.toEnd = false;
+    syncFilters();
     show();
   });
 
@@ -150,6 +190,9 @@
   });
 
   document.getElementById('btnPresent').addEventListener('click', enter);
+  document.getElementById('pArea').addEventListener('change', (e) => applyFilter('fArea', e.target.value));
+  document.getElementById('pDiv').addEventListener('change', (e) => applyFilter('fDiv', e.target.value));
+  document.getElementById('sFilters').addEventListener('click', (e) => { const b = e.target.closest('[data-pclear]'); if (b) applyFilter(b.dataset.pclear, ''); });
   document.getElementById('pExit').addEventListener('click', exit);
   document.getElementById('pPrev').addEventListener('click', () => go(-1));
   document.getElementById('pNext').addEventListener('click', () => go(1));

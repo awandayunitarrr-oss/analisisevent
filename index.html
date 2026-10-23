@@ -47,12 +47,24 @@
     <div class="loading">Memuat data survey…</div>
   </main>
 
+  <header class="slide-head" id="slideHead" aria-live="polite">
+    <div class="slide-head-top">
+      <img src="assets/img/logo-mpm.png" alt="MPM Distributor" width="190" height="96">
+      <span class="slide-eyebrow" id="sEyebrow"></span>
+      <span class="slide-filters" id="sFilters"></span>
+    </div>
+    <h2 id="sTitle"></h2>
+    <p class="slide-insight" id="sInsight"></p>
+  </header>
+
   <div class="present-bar" role="toolbar" aria-label="Kontrol presentasi">
     <button id="pExit" class="pbtn" type="button" title="Keluar (Esc)">✕</button>
     <button id="pPrev" class="pbtn" type="button" title="Sebelumnya (←)">◀</button>
     <span class="p-info"><b id="pTitle"></b><span id="pCount"></span></span>
     <button id="pNext" class="pbtn" type="button" title="Berikutnya (→ / Spasi)">▶</button>
     <button id="pFull" class="pbtn" type="button" title="Layar penuh (F)">⛶</button>
+    <label class="p-filter" title="Filter area kerja"><span>Area</span><select id="pArea" aria-label="Filter area kerja"></select></label>
+    <label class="p-filter" title="Filter divisi responden"><span>Divisi</span><select id="pDiv" aria-label="Filter divisi responden"></select></label>
     <span class="p-progress"><span id="pProgress"></span></span>
   </div>
 
